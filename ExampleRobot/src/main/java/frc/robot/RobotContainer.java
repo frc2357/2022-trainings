@@ -9,6 +9,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.AutoDriveCommand;
+import frc.robot.commands.AutoDriveCommandGroup;
 import frc.robot.commands.DriveProportionalCommand;
 import frc.robot.subsystems.DriveSubsystem;
 
@@ -51,7 +52,8 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An ExampleCommand will run in autonomous
-    return new AutoDriveCommand(m_driveSub, 1000, 0.25, 0.0);
+    //return new AutoDriveCommand(m_driveSub, 1000, 0.25, 0.0);
+
+    return new AutoDriveCommandGroup(m_driveSub);
   }
 }
