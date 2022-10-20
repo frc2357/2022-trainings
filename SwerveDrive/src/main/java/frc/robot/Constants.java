@@ -1,40 +1,66 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
-/**
- * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
- * constants. This class should not be used for any other purpose. All constants should be declared
- * globally (i.e. public static). Do not put anything functional in this class.
- *
- * <p>It is advised to statically import this class (or one of its inner classes) wherever the
- * constants are needed, to reduce verbosity.
- */
+import edu.wpi.first.math.geometry.Translation2d;
+
+import frc.robot.util.SwerveModuleConstants;
+
 public final class Constants {
 
-    public static final class SwerveConstants {
-        public static final boolean driveEnableCurrentLimit = true;
-        public static final double driveContinuousCurrentLimit;
-        public static final double drivePeakCurrentLimit;
-        public static final double drivePeakCurrentDuration;
-        public static final double driveKP;
-        public static final double driveKI;
-        public static final double driveKD;
-        public static final double driveKF;
-        public static final double openLoopRamp;
-        public static final double closedLoopRamp;
-        public static final boolean angleEnableCurrentLimit;
-        public static final double angleContinuousCurrentLimit;
-        public static final double anglePeakCurrentLimit;
-        public static final double anglePeakCurrentDuration;
-        public static final double angleKP;
-        public static final double angleKI;
-        public static final double angleKD;
-        public static final double angleKF;
-        public static final boolean canCoderInvert;
+    public static final class SWERVE_CONSTANTS {
+        // Drivetrain constants
+        public static final double TRACK_WIDTH = 0;
+        public static final double WHEEL_BASE = 0;
+        public static final double WHEEL_DIAMETER = 0;
+        public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
 
+        public static final Translation2d[] SWERVE_MODULE_OFFSETS = {
+            new Translation2d(WHEEL_BASE/2.0, TRACK_WIDTH/2.0),
+            new Translation2d(WHEEL_BASE/2.0, -TRACK_WIDTH/2.0),
+            new Translation2d(-WHEEL_BASE/2.0, TRACK_WIDTH/2.0),
+            new Translation2d(-WHEEL_BASE/2.0, -TRACK_WIDTH/2.0)
+        }
+
+        // Current limiting
+        public static final int ANGLE_CONTINUOUS_CURRENT_LIMIT = 0;
+        public static final int ANGLE_PEAK_CURRENT_LIMIT = 0;
+
+        public static final int DRIVE_CONTINUOUS_CURRENT_LIMIT = 0;
+        public static final int DRIVE_PEAK_CURRENT_LIMIT = 0;
+
+        // Drive PID
+        public static final double DRIVE_KP = 0;
+        public static final double DRIVE_KI = 0;
+        public static final double DRIVE_KD = 0;
+        public static final double DRIVE_KF = 0;
+
+        // Angle PID
+        public static final double ANGLE_KP = 0;
+        public static final double ANGLE_KI = 0;
+        public static final double ANGLE_KD = 0;
+        public static final double ANGLE_KF = 0;
+
+        // Module 0 constants (Front left)
+        public static final SwerveModuleConstants MOD0 = new SwerveModuleConstants(0, 0, 0, 0);
+        // Module 1 constants (Front right)
+        public static final SwerveModuleConstants MOD1 = new SwerveModuleConstants(0, 0, 0, 0);
+        // Module 2 constants (Back left)
+        public static final SwerveModuleConstants MOD2 = new SwerveModuleConstants(0, 0, 0, 0);
+        // Module 3 constants (Back right)
+        public static final SwerveModuleConstants MOD3 = new SwerveModuleConstants(0, 0, 0, 0);
+
+        public static final double DRIVE_KS = 0;
+        public static final double DRIVE_KV = 0;
+        public static final double DRIVE_KA = 0;
+        public static final double MAX_SPEED = 0;
+        public static final String DRIVE_GEAR_RATIO = null;
+        public static final boolean ANGLE_ENABLE_CURRENT_LIMIT = false;
+        public static final double ANGLE_PEAK_CURRENT_DURATION = 0;
+        public static final boolean CANCODER_INVERT = false;
+        public static final double CLOSED_LOOP_RAMP = 0;
+        public static final double OPEN_LOOP_RAMP = 0;
+        public static final double DRIVE_PEAK_CURRENT_DURATION = 0;
+        public static final boolean DRIVE_ENABLE_CURRENT_LIMIT = false;
+        
     }
 
 }
