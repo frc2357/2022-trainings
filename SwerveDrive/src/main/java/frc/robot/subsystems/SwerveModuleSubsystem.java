@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 
@@ -52,7 +53,7 @@ public class SwerveModuleSubsystem extends SubsystemBase {
         }
     }
 
-    private Object getState() {
+    public SwerveModuleState getState() {
         double velocity = Conversions.falconToMPS(this.m_driveMotor.getSelectedSensorVelocity(), Constants.SWERVE_CONSTANTS.WHEEL_CIRCUMFERENCE, Constants.SWERVE_CONSTANTS.DRIVE_GEAR_RATIO);
         Rotation2d angle = Rotation2d.fromDegrees(Conversions.falconToDegrees(this.m_angleMotor.getSelectedSensorPosition(), Constants.SWERVE_CONSTANTS.ANGLE_GEAR_RATIO));
         return new SwerveModuleState(velocity, angle);
@@ -66,5 +67,19 @@ public class SwerveModuleSubsystem extends SubsystemBase {
         this.m_angleMotor.config_kP(0, kP, Constants.SWERVE_CONSTANTS.TIMEOUT_MILLIS);
         this.m_angleMotor.config_kP(0, kI, Constants.SWERVE_CONSTANTS.TIMEOUT_MILLIS);
         this.m_angleMotor.config_kP(0, kD, Constants.SWERVE_CONSTANTS.TIMEOUT_MILLIS);
+    }
+
+    public int getModuleNumber() {
+        return this.m_moduleNumber;
+    }
+
+    public void setBrake() {
+        this.m_angleMotor.setNeutralMode(NeutralMode.Brake);
+        this.m_driveMotor.setNeutralMode(NeutralMode.Brake);
+    }
+
+    public void setCoast() {
+        this.m_angleMotor.setNeutralMode(NeutralMode.Coast);
+        this.m_driveMotor.setNeutralMode(NeutralMode.Coast);
     }
 }

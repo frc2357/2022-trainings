@@ -12,34 +12,34 @@ public final class CTREConfigs {
     public static TalonFXConfiguration swerveDriveFXConfig() {
         TalonFXConfiguration config = new TalonFXConfiguration();
         SupplyCurrentLimitConfiguration driveSupplyLimit = new SupplyCurrentLimitConfiguration(
-            Constants.SwerveConstants.driveEnableCurrentLimit, 
-            Constants.SwerveConstants.driveContinuousCurrentLimit, 
-            Constants.SwerveConstants.drivePeakCurrentLimit, 
-            Constants.SwerveConstants.drivePeakCurrentDuration);
+            Constants.SWERVE_CONSTANTS.DRIVE_ENABLE_CURRENT_LIMIT, 
+            Constants.SWERVE_CONSTANTS.DRIVE_CONTINUOUS_CURRENT_LIMIT, 
+            Constants.SWERVE_CONSTANTS.DRIVE_PEAK_CURRENT_LIMIT, 
+            Constants.SWERVE_CONSTANTS.DRIVE_PEAK_CURRENT_DURATION);
 
-        config.slot0.kP = Constants.SwerveConstants.driveKP;
-        config.slot0.kI = Constants.SwerveConstants.driveKI;
-        config.slot0.kD = Constants.SwerveConstants.driveKD;
-        config.slot0.kF = Constants.SwerveConstants.driveKF;        
+        config.slot0.kP = Constants.SWERVE_CONSTANTS.DRIVE_KP;
+        config.slot0.kI = Constants.SWERVE_CONSTANTS.DRIVE_KI;
+        config.slot0.kD = Constants.SWERVE_CONSTANTS.DRIVE_KD;
+        config.slot0.kF = Constants.SWERVE_CONSTANTS.DRIVE_KF;        
         config.supplyCurrLimit = driveSupplyLimit;
         config.initializationStrategy = SensorInitializationStrategy.BootToZero;
-        config.openloopRamp = Constants.SwerveConstants.openLoopRamp;
-        config.closedloopRamp = Constants.SwerveConstants.closedLoopRamp;
+        config.openloopRamp = Constants.SWERVE_CONSTANTS.OPEN_LOOP_RAMP;
+        config.closedloopRamp = Constants.SWERVE_CONSTANTS.CLOSED_LOOP_RAMP;
         return config;
     }
 
     public static TalonFXConfiguration swerveAngleFXConfig() {
         TalonFXConfiguration angleConfig = new TalonFXConfiguration();
         SupplyCurrentLimitConfiguration angleSupplyLimit = new SupplyCurrentLimitConfiguration(
-            Constants.SwerveConstants.angleEnableCurrentLimit, 
-            Constants.SwerveConstants.angleContinuousCurrentLimit, 
-            Constants.SwerveConstants.anglePeakCurrentLimit, 
-            Constants.SwerveConstants.anglePeakCurrentDuration);
+            Constants.SWERVE_CONSTANTS.ANGLE_ENABLE_CURRENT_LIMIT, 
+            Constants.SWERVE_CONSTANTS.ANGLE_CONTINUOUS_CURRENT_LIMIT, 
+            Constants.SWERVE_CONSTANTS.ANGLE_PEAK_CURRENT_LIMIT, 
+            Constants.SWERVE_CONSTANTS.ANGLE_PEAK_CURRENT_DURATION);
 
-        angleConfig.slot0.kP = Constants.SwerveConstants.angleKP;
-        angleConfig.slot0.kI = Constants.SwerveConstants.angleKI;
-        angleConfig.slot0.kD = Constants.SwerveConstants.angleKD;
-        angleConfig.slot0.kF = Constants.SwerveConstants.angleKF;
+        angleConfig.slot0.kP = Constants.SWERVE_CONSTANTS.ANGLE_KP;
+        angleConfig.slot0.kI = Constants.SWERVE_CONSTANTS.ANGLE_KI;
+        angleConfig.slot0.kD = Constants.SWERVE_CONSTANTS.ANGLE_KD;
+        angleConfig.slot0.kF = Constants.SWERVE_CONSTANTS.ANGLE_KF;
         angleConfig.supplyCurrLimit = angleSupplyLimit;
         angleConfig.initializationStrategy = SensorInitializationStrategy.BootToZero;
         return angleConfig;
@@ -48,7 +48,7 @@ public final class CTREConfigs {
     public static CANCoderConfiguration swerveCancoderConfig() {
         CANCoderConfiguration config = new CANCoderConfiguration();
         config.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
-        config.sensorDirection = Constants.SwerveConstants.canCoderInvert;
+        config.sensorDirection = Constants.SWERVE_CONSTANTS.CANCODER_INVERT;
         config.initializationStrategy = SensorInitializationStrategy.BootToAbsolutePosition;
         config.sensorTimeBase = SensorTimeBase.PerSecond;
         return config;
