@@ -14,18 +14,22 @@ import frc.robot.commands.DriveProportionalCommand;
 import frc.robot.subsystems.DriveSubsystem;
 
 /**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in
+ * the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of
+ * the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  
+
   private DriveSubsystem m_driveSub;
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  /**
+   * The container for the robot. Contains subsystems, OI devices, and commands.
+   */
   public RobotContainer() {
-
 
     WPI_TalonFX leftFalconMaster = new WPI_TalonFX(Constants.DRIVE_MOTOR_LEFT_1);
 
@@ -39,7 +43,8 @@ public class RobotContainer {
         new WPI_TalonFX(Constants.DRIVE_MOTOR_RIGHT_2),
         new WPI_TalonFX(Constants.DRIVE_MOTOR_RIGHT_3) };
 
-    m_driveSub = new DriveSubsystem(leftFalconMaster, leftFalconSlaves, rightFalconMaster, rightFalconSlaves, Constants.IS_RIGHT_DRIVE_INVERTED);
+    m_driveSub = new DriveSubsystem(leftFalconMaster, leftFalconSlaves, rightFalconMaster, rightFalconSlaves,
+        Constants.IS_RIGHT_DRIVE_INVERTED, Constants.DEADBAND);
 
     XboxController controller = new XboxController(Constants.CONTROLLER_PORT);
 

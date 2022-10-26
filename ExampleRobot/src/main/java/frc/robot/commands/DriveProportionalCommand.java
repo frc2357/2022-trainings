@@ -15,7 +15,7 @@ public class DriveProportionalCommand extends CommandBase {
 
     @Override 
     public void execute() {
-        m_driveSub.driveProportional(m_controller.getLeftY(), m_controller.getRightX());
+        m_driveSub.driveProportionalWithStick(m_controller.getLeftY(), m_controller.getRightX());
     }
 
     @Override
