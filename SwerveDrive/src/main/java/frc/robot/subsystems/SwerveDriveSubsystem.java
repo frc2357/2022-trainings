@@ -1,92 +1,99 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.PigeonIMU;
+import com.swervedrivespecialties.swervelib.Mk4ModuleConfiguration;
+import com.swervedrivespecialties.swervelib.Mk4SwerveModuleHelper;
+import com.swervedrivespecialties.swervelib.SwerveModule;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-public class SwerveDriveSubsystem extends SubsystemBase {
-    private static SwerveDriveSubsystem instance = null;
+// SPS MK4i L2
 
+public class SwerveDriveSubsystem extends SubsystemBase {
+
+    private static SwerveDriveSubsystem instance = null;
+    
     public static SwerveDriveSubsystem getInstance() {
         return instance;
     }
 
-    public static class Configuration {
+    private SwerveDriveKinematics m_kinematics;
 
-    }
+    private PigeonIMU m_gyro;
 
-    private SwerveModuleSubsystem[] m_swerveModules;
-    private SwerveDriveOdometry m_swerveOdometry;
+    private SwerveModule m_frontLeftModule;
+    private SwerveModule m_frontRightModule;
+    private SwerveModule m_backLeftModule;
+    private SwerveModule m_backRightModule;
 
-    private PigeonIMU m_pigeon;
-    private boolean m_isGyroReversed;
+    private ChassisSpeeds m_chassisSpeeds;
+
+    public double m_maxVoltage;
+    public double m_maxVelocity;
+    public double m_maxAngularVelocity;
 
     private Configuration m_config;
 
-    public SwerveDriveSubsystem() {
-        m_swerveOdometry = new SwerveDriveOdometry(Constants.SWERVE_CONSTANTS.SWERVE_KINEMATICS, Rotation2d.fromDegrees(m_pigeon.getYaw()));
-
-        m_swerveModules = new SwerveModuleSubsystem[] {
-            new SwerveModuleSubsystem(0, Constants.SWERVE_CONSTANTS.MOD0),
-            new SwerveModuleSubsystem(1, Constants.SWERVE_CONSTANTS.MOD1),
-            new SwerveModuleSubsystem(2, Constants.SWERVE_CONSTANTS.MOD2),
-            new SwerveModuleSubsystem(3, Constants.SWERVE_CONSTANTS.MOD3)
-        };
+    public static class Configuration {
+        public double m_maxVoltage = 0;
+        public double m_maxVelocityMeters = 0;
+        public double m_maxAngularVelocity = 0;
     }
 
-    public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
-        SwerveModuleState[] moduleStates;
+    public SwerveDriveSubsystem(SwerveModule frontLeftModule, SwerveModule frontRightModule, SwerveModule backLeftModule, SwerveModule backRightModule, PigeonIMU gyro) {
 
-        moduleStates = Constants.SWERVE_CONSTANTS.SWERVE_KINEMATICS.toSwerveModuleStates(
-            fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
-                translation.getX(),
-                translation.getY(),
-                rotation,
-                Rotation2d.fromDegrees(m_pigeon.getYaw())
-            )
-            : new ChassisSpeeds(
-                translation.getX(),
-                translation.getY(),
-                rotation
-            )
+        instance = this;
+        
+        m_kinematics = new SwerveDriveKinematics(
+            new Translation2d(Constants.SWERVE.TRACK_WIDTH / 2.0, Constants.SWERVE.WHEEL_BASE / 2.0),
+            new Translation2d(Constants.SWERVE.TRACK_WIDTH / 2.0, -Constants.SWERVE.WHEEL_BASE / 2.0),
+            new Translation2d(-Constants.SWERVE.TRACK_WIDTH / 2.0, Constants.SWERVE.WHEEL_BASE / 2.0),
+            new Translation2d(-Constants.SWERVE.TRACK_WIDTH / 2.0, -Constants.SWERVE.WHEEL_BASE / 2.0)
         );
 
-        SwerveDriveKinematics.desaturateWheelSpeeds(moduleStates, Constants.SWERVE_CONSTANTS.MAX_SPEED);
+        m_gyro = gyro;
 
-        for (SwerveModuleSubsystem mod : m_swerveModules) {
-            mod.setState(moduleStates[mod.getModuleNumber()], isOpenLoop);
-        }
+        m_frontLeftModule = frontLeftModule;
+        m_frontRightModule = frontRightModule;
+        m_backLeftModule = backLeftModule;
+        m_backRightModule = backRightModule;
+
     }
 
-    public Pose2d getPose() {
-        return m_swerveOdometry.getPoseMeters();
+    public void configure(Configuration config) {
+        m_config = config;
+
+        m_maxVoltage = config.m_maxVoltage;
+        m_maxVelocity = config.m_maxVelocityMeters;
+        m_maxAngularVelocity = config.m_maxAngularVelocity;
     }
 
-    public SwerveModuleState[] getModuleStates() {
-        SwerveModuleState[] states = new SwerveModuleState[4];
-        for(SwerveModuleSubsystem mod : m_swerveModules) {
-            states[mod.getModuleNumber()] = mod.getState();
-        }
-        return states;
+    public void zeroGyro() {
+        m_gyro.setFusedHeading(0.0);
     }
 
-    public void setBrake() {
-        for (SwerveModuleSubsystem mod : m_swerveModules) {
-            mod.setBrake();
-        }
+    public Rotation2d getGyroRotation() {
+        return Rotation2d.fromDegrees(m_gyro.getFusedHeading());
     }
 
-    public void setCoast() {
-        for (SwerveModuleSubsystem mod : m_swerveModules) {
-            mod.setCoast();
-        }
+    public void drive(ChassisSpeeds chassisSpeeds) {
+        m_chassisSpeeds = chassisSpeeds;
+    }
+
+    @Override
+    public void periodic() {
+        SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
+        SwerveDriveKinematics.desaturateWheelSpeeds(states, m_maxVelocity);
+
+        m_frontLeftModule.set(states[0].speedMetersPerSecond / m_maxVelocity, states[0].angle.getRadians());
+        m_frontRightModule.set(states[1].speedMetersPerSecond / m_maxVelocity, states[1].angle.getRadians());
+        m_backLeftModule.set(states[2].speedMetersPerSecond / m_maxVelocity, states[2].angle.getRadians());
+        m_backRightModule.set(states[3].speedMetersPerSecond / m_maxVelocity, states[3].angle.getRadians());
     }
 }
