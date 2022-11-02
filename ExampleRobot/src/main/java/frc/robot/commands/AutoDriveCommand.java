@@ -3,7 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 
-public class AutoDriveCommand extends CommandBase{
+public class AutoDriveCommand extends CommandBase {
 
     private DriveSubsystem m_driveSub;
     private double m_timeMillis, m_timeTotal, m_turn, m_speed;
@@ -32,4 +32,4 @@ public class AutoDriveCommand extends CommandBase{
     public void end(boolean interrupted) {
         m_driveSub.driveProportional(0.0, 0.0);
     }
-}   
+}

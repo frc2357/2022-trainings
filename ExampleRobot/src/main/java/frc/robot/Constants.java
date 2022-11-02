@@ -22,6 +22,7 @@ public final class Constants {
     public static final int DRIVE_MOTOR_RIGHT_3 = 16;
 
     public static final boolean IS_RIGHT_DRIVE_INVERTED = true;
+    public static final double DEADBAND = 0.1;
 
     public static final int CONTROLLER_PORT = 0;
 }
