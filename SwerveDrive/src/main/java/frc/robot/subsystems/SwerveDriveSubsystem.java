@@ -1,8 +1,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.PigeonIMU;
-import com.swervedrivespecialties.swervelib.Mk4ModuleConfiguration;
-import com.swervedrivespecialties.swervelib.Mk4SwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -34,16 +32,12 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
     private ChassisSpeeds m_chassisSpeeds;
 
-    public double m_maxVoltage;
-    public double m_maxVelocity;
-    public double m_maxAngularVelocity;
-
     private Configuration m_config;
 
     public static class Configuration {
         public double m_maxVoltage = 0;
-        public double m_maxVelocityMeters = 0;
-        public double m_maxAngularVelocity = 0;
+        public double m_maxMetersPerSecond = 0;
+        public double m_maxRadiansPerSecond = 0;
     }
 
     public SwerveDriveSubsystem(SwerveModule frontLeftModule, SwerveModule frontRightModule, SwerveModule backLeftModule, SwerveModule backRightModule, PigeonIMU gyro) {
@@ -68,10 +62,6 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
     public void configure(Configuration config) {
         m_config = config;
-
-        m_maxVoltage = config.m_maxVoltage;
-        m_maxVelocity = config.m_maxVelocityMeters;
-        m_maxAngularVelocity = config.m_maxAngularVelocity;
     }
 
     public void zeroGyro() {
@@ -82,18 +72,25 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         return Rotation2d.fromDegrees(m_gyro.getFusedHeading());
     }
 
-    public void drive(ChassisSpeeds chassisSpeeds) {
-        m_chassisSpeeds = chassisSpeeds;
+    public ChassisSpeeds getChassisSpeeds(double x, double y, double rotation) {
+        ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+            x * m_config.m_maxMetersPerSecond, 
+            y * m_config.m_maxMetersPerSecond, 
+            rotation * m_config.m_maxMetersPerSecond, 
+            getGyroRotation()
+        );
+
+        return chassisSpeeds;
     }
 
-    @Override
-    public void periodic() {
+    public void drive(ChassisSpeeds chassisSpeeds) {
+        m_chassisSpeeds = chassisSpeeds;
         SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
-        SwerveDriveKinematics.desaturateWheelSpeeds(states, m_maxVelocity);
+        SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxMetersPerSecond);
 
-        m_frontLeftModule.set(states[0].speedMetersPerSecond / m_maxVelocity, states[0].angle.getRadians());
-        m_frontRightModule.set(states[1].speedMetersPerSecond / m_maxVelocity, states[1].angle.getRadians());
-        m_backLeftModule.set(states[2].speedMetersPerSecond / m_maxVelocity, states[2].angle.getRadians());
-        m_backRightModule.set(states[3].speedMetersPerSecond / m_maxVelocity, states[3].angle.getRadians());
+        m_frontLeftModule.set(states[0].speedMetersPerSecond / m_config.m_maxMetersPerSecond, states[0].angle.getRadians());
+        m_frontRightModule.set(states[1].speedMetersPerSecond / m_config.m_maxMetersPerSecond, states[1].angle.getRadians());
+        m_backLeftModule.set(states[2].speedMetersPerSecond / m_config.m_maxMetersPerSecond, states[2].angle.getRadians());
+        m_backRightModule.set(states[3].speedMetersPerSecond / m_config.m_maxMetersPerSecond, states[3].angle.getRadians());
     }
 }

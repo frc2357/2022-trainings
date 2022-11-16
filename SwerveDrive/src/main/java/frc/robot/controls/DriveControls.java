@@ -1,6 +1,5 @@
 package frc.robot.controls;
 
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.util.Utility;
 
@@ -13,6 +12,7 @@ public class DriveControls {
         m_deadband = deadband;
     }
 
+    // TODO: Switch to TriggerAxis
     public double getX() {
         return -Utility.modifyAxis(m_controller.getLeftX(), m_deadband);
     }

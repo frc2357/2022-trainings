@@ -48,11 +48,11 @@ public final class Constants {
 
             config.m_maxVoltage = 12.0;
 
-            config.m_maxVelocityMeters = 6380 / 60.0 * 
+            config.m_maxMetersPerSecond = 6380 / 60.0 * 
                 SdsModuleConfigurations.MK4_L2.getDriveReduction() * 
                 SdsModuleConfigurations.MK4_L2.getWheelDiameter() * Math.PI;
                 
-            config.m_maxAngularVelocity = config.m_maxVelocityMeters /
+            config.m_maxRadiansPerSecond = config.m_maxRadiansPerSecond /
                 Math.hypot(TRACK_WIDTH / 2.0, WHEEL_BASE / 2.0);
 
             return config;

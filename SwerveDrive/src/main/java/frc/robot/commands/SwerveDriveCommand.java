@@ -18,12 +18,7 @@ public class SwerveDriveCommand extends CommandBase {
 
     @Override
     public void execute() {
-        ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-            m_driverController.getX() * m_driveSubsystem.m_maxVelocity, 
-            m_driverController.getY() * m_driveSubsystem.m_maxVelocity, 
-            m_driverController.getRotation() * m_driveSubsystem.m_maxAngularVelocity, 
-            m_driveSubsystem.getGyroRotation()
-        );
+        ChassisSpeeds chassisSpeeds = m_driveSubsystem.getChassisSpeeds(m_driverController.getX(), m_driverController.getY(), m_driverController.getRotation());
 
         m_driveSubsystem.drive(chassisSpeeds);
 
