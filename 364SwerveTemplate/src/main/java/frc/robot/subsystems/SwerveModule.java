@@ -22,7 +22,8 @@ public class SwerveModule {
     private CANCoder m_cancoder;
     private double m_lastAngle;
 
-    SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(Constants.SWERVE.DRIVE_KS, Constants.SWERVE.DRIVE_KV, Constants.SWERVE.DRIVE_KA);
+    private SwerveDriveSubsystem.Configuration m_config;
+
 
     public SwerveModule(int moduleNumber, SwerveModuleConstants moduleConstants) {
         m_moduleNumber = moduleNumber;
@@ -40,6 +41,10 @@ public class SwerveModule {
         m_lastAngle = getState().angle.getDegrees();
     }
 
+    public void configure(SwerveDriveSubsystem.Configuration config) {
+        m_config = config;
+    }
+
     public void setDesiredState(SwerveModuleState desiredState) {
         desiredState = CTREModuleState.optimize(desiredState, getState().angle);
 
@@ -47,25 +52,25 @@ public class SwerveModule {
         m_driveMotor.set(ControlMode.PercentOutput, percentOutput);
 
         double angle = (Math.abs(desiredState.speedMetersPerSecond) <= (Constants.SWERVE.MAX_SPEED_METER_PER_SECOND * 0.01)) ? m_lastAngle : desiredState.angle.getDegrees(); // Prevents jittering
-        m_turnMotor.set(ControlMode.Position, Conversions.degreesToFalcon(angle, Constants.SWERVE.TURN_GEAR_RATIO));
+        m_turnMotor.set(ControlMode.Position, Conversions.degreesToFalcon(angle, m_config.m_turnGearRatio));
         m_lastAngle = angle;
     }
 
     private void resetToAbsolute() {
-        double absolutePosition = Conversions.degreesToFalcon(getCanCoder().getDegrees() - m_angleOffset, Constants.SWERVE.TURN_GEAR_RATIO);
+        double absolutePosition = Conversions.degreesToFalcon(getCanCoder().getDegrees() - m_angleOffset, m_config.m_turnGearRatio);
         m_turnMotor.setSelectedSensorPosition(absolutePosition);
     }
 
     private void configCANCoder() {
         m_cancoder.configFactoryDefault();
-        m_cancoder.configAllSettings(Robot.ctreConfigs.swerveCANCoderConfig);
+        m_cancoder.configAllSettings(m_config.m_cancoderConfig);
     }
 
     private void configTurnMotor() {
         m_turnMotor.configFactoryDefault();
-        m_turnMotor.configAllSettings(Robot.ctreConfigs.swerveTurnFXConfig);
-        m_turnMotor.setInverted(Constants.SWERVE.TURN_INVERT);
-        m_turnMotor.setNeutralMode(Constants.SWERVE.TURN_NEUTRAL_MODE);
+        m_turnMotor.configAllSettings(m_config.m_turnMotorConfig);
+        m_turnMotor.setInverted(m_config.m_turnInvert);
+        m_turnMotor.setNeutralMode(m_config.m_turnNeutralMode);
         resetToAbsolute();
     }
 
@@ -78,8 +83,8 @@ public class SwerveModule {
     }
 
     public SwerveModuleState getState() {
-        double velocity = Conversions.falconToMPS(m_driveMotor.getSelectedSensorVelocity(), Constants.SWERVE.WHEEL_CIRCUMFERENCE, Constants.SWERVE.DRIVE_GEAR_RATIO);
-        Rotation2d angle = Rotation2d.fromDegrees(Conversions.falconToDegrees(m_turnMotor.getSelectedSensorPosition(), Constants.SWERVE.TURN_GEAR_RATIO));
+        double velocity = Conversions.falconToMPS(m_driveMotor.getSelectedSensorVelocity(), m_config.m_wheelCircumference, m_config.m_driveGearRatio);
+        Rotation2d angle = Rotation2d.fromDegrees(Conversions.falconToDegrees(m_turnMotor.getSelectedSensorPosition(), m_config.m_turnGearRatio));
         return new SwerveModuleState(velocity, angle);
     }
 }
