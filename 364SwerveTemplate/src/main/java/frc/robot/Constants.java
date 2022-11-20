@@ -49,6 +49,11 @@ public final class Constants {
         
     }
 
+    public static final class CONTROLLER {
+        public static final int DRIVE_CONTROLLER_PORT = 0;
+        public static final double DRIVE_CONTROLLER_DEADBAND = 0.1;
+    }
+
     public static final class SWERVE {
 
         public static final class MODULE_OFFSETS {

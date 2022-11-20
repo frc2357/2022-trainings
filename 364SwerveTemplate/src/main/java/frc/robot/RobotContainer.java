@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.TeleopSwerveCommand;
+import frc.robot.controls.SwerveDriveControls;
 import frc.robot.subsystems.SwerveDriveSubsystem;
 
 /**
@@ -24,9 +25,7 @@ public class RobotContainer {
 
   private final Joystick driver = new Joystick(0);
 
-  private final int translationAxis = XboxController.Axis.kLeftY.value;
-  private final int strafeAxis = XboxController.Axis.kLeftX.value;
-  private final int rotationAxis = XboxController.Axis.kRightX.value;
+  private final SwerveDriveControls m_driveControls;
 
   private final JoystickButton zeroGyro = new JoystickButton(driver, XboxController.Button.kY.value);
 
@@ -34,7 +33,10 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    swerveSubsystem.setDefaultCommand(new TeleopSwerveCommand(swerveSubsystem, driver, translationAxis, strafeAxis, rotationAxis));
+    XboxController driverController = new XboxController(Constants.CONTROLLER.DRIVE_CONTROLLER_PORT);
+    m_driveControls = new SwerveDriveControls(driverController, Constants.CONTROLLER.DRIVE_CONTROLLER_DEADBAND);
+
+    swerveSubsystem.setDefaultCommand(new TeleopSwerveCommand(swerveSubsystem, m_driveControls));
 
     // Configure the button bindings
     configureButtonBindings();
