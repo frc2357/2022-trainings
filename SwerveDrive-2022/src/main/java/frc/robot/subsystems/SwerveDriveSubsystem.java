@@ -12,6 +12,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -46,6 +48,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     }
 
     public SwerveDriveSubsystem(SwerveModule frontLeftModule, SwerveModule frontRightModule, SwerveModule backLeftModule, SwerveModule backRightModule, PigeonIMU gyro) {
+
 
         instance = this;
         
@@ -93,10 +96,10 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxMetersPerSecond);
 
-        m_frontLeftModule.set(states[0].speedMetersPerSecond / ][\m_config.m_maxMetersPerSecond, states[0].angle.getRadians());
-        m_frontRightModule.set(states[1].speedMetersPerSecond / m_config.m_maxMetersPerSecond, states[1].angle.getRadians());
-        m_backLeftModule.set(states[2].speedMetersPerSecond / m_config.m_maxMetersPerSecond, states[2].angle.getRadians());
-        m_backRightModule.set(states[3].speedMetersPerSecond / m_config.m_maxMetersPerSecond, states[3].angle.getRadians());
+        m_frontLeftModule.set(states[0].speedMetersPerSecond * 0 / m_config.m_maxMetersPerSecond, states[0].angle.getRadians());
+        m_frontRightModule.set(states[1].speedMetersPerSecond * 0 / m_config.m_maxMetersPerSecond, states[1].angle.getRadians());
+        m_backLeftModule.set(states[2].speedMetersPerSecond * 0 / m_config.m_maxMetersPerSecond, states[2].angle.getRadians());
+        m_backRightModule.set(states[3].speedMetersPerSecond * 0 / m_config.m_maxMetersPerSecond, states[3].angle.getRadians());
     }
 
     @Override

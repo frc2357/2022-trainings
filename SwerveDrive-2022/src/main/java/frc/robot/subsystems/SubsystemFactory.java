@@ -4,6 +4,9 @@ import com.ctre.phoenix.sensors.PigeonIMU;
 import com.swervedrivespecialties.swervelib.Mk4SwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Constants;
 
 public class SubsystemFactory {
@@ -11,7 +14,12 @@ public class SubsystemFactory {
     public SubsystemFactory() {}
 
     public SwerveDriveSubsystem CreateSwerveDriveSubsystem() {
+        ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain");
+        
         SwerveModule frontLeftModule = Mk4SwerveModuleHelper.createFalcon500(
+            tab.getLayout("Front Left Module", BuiltInLayouts.kList)
+                .withSize(2, 4)
+                .withPosition(0,0),
             Mk4SwerveModuleHelper.GearRatio.L2,
             Constants.CAN_ID.FRONT_LEFT_DRIVE,
             Constants.CAN_ID.FRONT_LEFT_ANGLE,
@@ -20,6 +28,9 @@ public class SubsystemFactory {
         );
 
         SwerveModule frontRightModule = Mk4SwerveModuleHelper.createFalcon500(
+            tab.getLayout("Front Right Module", BuiltInLayouts.kList)
+                .withSize(2, 4)
+                .withPosition(2,0),
             Mk4SwerveModuleHelper.GearRatio.L2,
             Constants.CAN_ID.FRONT_RIGHT_DRIVE,
             Constants.CAN_ID.FRONT_RIGHT_ANGLE,
@@ -28,6 +39,9 @@ public class SubsystemFactory {
         );
 
         SwerveModule backLeftModule = Mk4SwerveModuleHelper.createFalcon500(
+            tab.getLayout("Back Left Module", BuiltInLayouts.kList)
+                .withSize(2, 4)
+                .withPosition(4,0),
             Mk4SwerveModuleHelper.GearRatio.L2,
             Constants.CAN_ID.BACK_LEFT_DRIVE,
             Constants.CAN_ID.BACK_LEFT_ANGLE,
@@ -36,6 +50,9 @@ public class SubsystemFactory {
         );
 
         SwerveModule backRightModule = Mk4SwerveModuleHelper.createFalcon500(
+            tab.getLayout("Back Right Module", BuiltInLayouts.kList)
+                .withSize(2, 4)
+                .withPosition(6,0),
             Mk4SwerveModuleHelper.GearRatio.L2,
             Constants.CAN_ID.BACK_RIGHT_DRIVE,
             Constants.CAN_ID.BACK_RIGHT_ANGLE,

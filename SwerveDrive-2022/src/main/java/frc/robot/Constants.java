@@ -35,13 +35,19 @@ public final class Constants {
 
     public static final class SWERVE {
         // Drivetrain constants
-        public static final double TRACK_WIDTH = 0;
-        public static final double WHEEL_BASE = 0;
+        public static final double TRACK_WIDTH = .60325;
+        public static final double WHEEL_BASE = .62865;
         
-        public static final double FRONT_LEFT_OFFSET = 5.1669;
-        public static final double FRONT_RIGHT_OFFSET = 2.3491;
-        public static final double BACK_LEFT_OFFSET = 0.9225;
-        public static final double BACK_RIGHT_OFFSET = 5.0720;
+        public static final double FRONT_LEFT_OFFSET = 0;
+        public static final double FRONT_RIGHT_OFFSET = 0;
+        public static final double BACK_LEFT_OFFSET = 0;
+        public static final double BACK_RIGHT_OFFSET = 4;
+
+        // Front Left Encoder Offset: 
+        // Front Right Encoder Offset: -4.3580
+        // Back Left Encoder Offset: 
+        // Back Right Encoder Offset: 0.9225
+
         public static SwerveDriveSubsystem.Configuration GET_SWERVE_DRIVE_CONFIG() {
             SwerveDriveSubsystem.Configuration config = new SwerveDriveSubsystem.Configuration();
 
@@ -57,10 +63,6 @@ public final class Constants {
             return config;
         }
 
-        // Front Left Encoder Offset: 5.1669 
-        // Front Right Encoder Offset: 2.3491
-        // Back Left Encoder Offset: 5.0720
-        // Back Right Encoder Offset: 0.9225
     }
 
 }
