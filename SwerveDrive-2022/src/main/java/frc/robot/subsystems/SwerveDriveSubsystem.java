@@ -3,7 +3,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.CANCoderConfiguration;
-import com.ctre.phoenix.sensors.PigeonIMU;
+import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.swervedrivespecialties.swervelib.ctre.CanCoderFactoryBuilder.Direction;
 
@@ -30,7 +30,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
     private SwerveDriveKinematics m_kinematics;
 
-    private PigeonIMU m_gyro;
+    private WPI_Pigeon2 m_gyro;
 
     private SwerveModule m_frontLeftModule;
     private SwerveModule m_frontRightModule;
@@ -47,7 +47,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         public double m_maxRadiansPerSecond = 0;
     }
 
-    public SwerveDriveSubsystem(SwerveModule frontLeftModule, SwerveModule frontRightModule, SwerveModule backLeftModule, SwerveModule backRightModule, PigeonIMU gyro) {
+    public SwerveDriveSubsystem(SwerveModule frontLeftModule, SwerveModule frontRightModule, SwerveModule backLeftModule, SwerveModule backRightModule, WPI_Pigeon2 gyro) {
 
 
         instance = this;
@@ -73,11 +73,11 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     }
 
     public void zeroGyro() {
-        m_gyro.setFusedHeading(0.0);
+        m_gyro.setYaw(0.0);
     }
 
     public Rotation2d getGyroRotation() {
-        return Rotation2d.fromDegrees(m_gyro.getFusedHeading());
+        return Rotation2d.fromDegrees(m_gyro.getYaw());
     }
 
     public ChassisSpeeds getChassisSpeeds(double x, double y, double rotation) {

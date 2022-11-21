@@ -4,7 +4,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.sensors.CANCoderConfiguration;
-import com.ctre.phoenix.sensors.PigeonIMU;
+import com.ctre.phoenix.sensors.WPI_Pigeon2;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -87,12 +87,12 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
     public SwerveModule[] m_swerveModules;
     
-    public PigeonIMU m_gyro;
+    public WPI_Pigeon2 m_gyro;
 
     public SwerveDriveSubsystem() {
         instance = this;
 
-        m_gyro = new PigeonIMU(Constants.CAN_ID.GYRO);
+        m_gyro = new WPI_Pigeon2(Constants.CAN_ID.GYRO);
         m_gyro.configFactoryDefault();
         zeroGyro();
 

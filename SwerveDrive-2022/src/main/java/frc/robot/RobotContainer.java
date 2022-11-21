@@ -4,13 +4,6 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
-import com.swervedrivespecialties.swervelib.Mk4ModuleConfiguration;
-import com.swervedrivespecialties.swervelib.Mk4SwerveModuleHelper;
-import com.swervedrivespecialties.swervelib.ModuleConfiguration;
-import com.swervedrivespecialties.swervelib.ctre.CtreUtils;
-
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -30,42 +23,6 @@ public class RobotContainer {
   private final DriveControls m_driverControls;
 
   public RobotContainer() {
-    // final double TICKS_PER_ROTATION = 2048.0;
-    // ModuleConfiguration moduleConfiguration = Mk4SwerveModuleHelper.GearRatio.L2.getConfiguration();
-
-    // TalonFX driveFrontLeft = new TalonFX(Constants.CAN_ID.FRONT_LEFT_DRIVE);
-    // TalonFX turnFrontLeft = new TalonFX(Constants.CAN_ID.FRONT_LEFT_ANGLE);
-    // TalonFX driveFrontRight = new TalonFX(Constants.CAN_ID.FRONT_RIGHT_DRIVE);
-    // TalonFX turnFrontRight = new TalonFX(Constants.CAN_ID.FRONT_RIGHT_ANGLE);
-    // TalonFX driveBackLeft = new TalonFX(Constants.CAN_ID.BACK_LEFT_DRIVE);
-    // TalonFX turnBackLeft = new TalonFX(Constants.CAN_ID.BACK_LEFT_ANGLE);
-    // TalonFX driveBackRight = new TalonFX(Constants.CAN_ID.BACK_RIGHT_DRIVE);
-    // TalonFX turnBackRight = new TalonFX(Constants.CAN_ID.BACK_RIGHT_ANGLE);
-
-    // TalonFXConfiguration motorConfiguration = new TalonFXConfiguration();
-
-    // double sensorPositionCoefficient = Math.PI * moduleConfiguration.getWheelDiameter() * moduleConfiguration.getDriveReduction() / TICKS_PER_ROTATION;
-    // double sensorVelocityCoefficient = sensorPositionCoefficient * 10.0;
-
-    // if (hasVoltageCompensation()) {
-    //     motorConfiguration.voltageCompSaturation = nominalVoltage;
-    // }
-
-    // if (hasCurrentLimit()) {
-    //     motorConfiguration.supplyCurrLimit.currentLimit = currentLimit;
-    //     motorConfiguration.supplyCurrLimit.enable = true;
-    // }
-
-    // // CtreUtils.checkCtreError(driveFrontLeft.configAllSettings(motorConfiguration), "Failed to configure DriveFrontLeft");
-    // CtreUtils.checkCtreError(driveFrontLeft.configAllSettings(motorConfiguration), "Failed to configure TurnFrontLeft");
-    // CtreUtils.checkCtreError(driveFrontLeft.configAllSettings(motorConfiguration), "Failed to configure DriveFrontRight");
-    // CtreUtils.checkCtreError(driveFrontLeft.configAllSettings(motorConfiguration), "Failed to configure TurnFrontRight");
-    // CtreUtils.checkCtreError(driveFrontLeft.configAllSettings(motorConfiguration), "Failed to configure DriveBackLeft");
-    // CtreUtils.checkCtreError(driveFrontLeft.configAllSettings(motorConfiguration), "Failed to configure TurnBackLeft");
-    // CtreUtils.checkCtreError(driveFrontLeft.configAllSettings(motorConfiguration), "Failed to configure DriveBackRight");
-    // CtreUtils.checkCtreError(driveFrontLeft.configAllSettings(motorConfiguration), "Failed to configure TurnBackRight");
-    
-
     SubsystemFactory subsystemFactory = new SubsystemFactory();
     SwerveDriveSubsystem driveSubsystem = subsystemFactory.CreateSwerveDriveSubsystem();
 
