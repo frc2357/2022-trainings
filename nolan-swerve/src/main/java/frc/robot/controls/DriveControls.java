@@ -17,7 +17,7 @@ public class DriveControls {
     }
 
     public double getY() {
-        return -modifyAxis(m_controller.getLeftY(), m_deadband);
+        return modifyAxis(m_controller.getLeftY(), m_deadband);
     }
 
     public double getRotation() {
