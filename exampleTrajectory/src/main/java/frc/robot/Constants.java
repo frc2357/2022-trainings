@@ -4,9 +4,12 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.controller.RamseteController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.constraint.TrajectoryConstraint;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -65,9 +68,9 @@ public final class Constants {
     // These characterization values MUST be determined either experimentally or theoretically
     // for *your* robot's drive.
     // The SysId tool provides a convenient method for obtaining these values for your robot.
-    public static final double ksVolts = 1;
-    public static final double kvVoltSecondsPerMeter = 0.8;
-    public static final double kaVoltSecondsSquaredPerMeter = 0.15;
+    public static final double ksVolts = 0.65131;
+    public static final double kvVoltSecondsPerMeter = 0.046483;
+    public static final double kaVoltSecondsSquaredPerMeter = 0.0079548;
 
     public static final double kMaxSpeedMetersPerSecond = 3;
   }
@@ -88,7 +91,7 @@ public final class Constants {
 
     public static final double kPModuleTurningController = 1;
 
-    public static final double kPModuleDriveController = 1;
+    public static final double kPModuleDriveController = 0.011185;
   }
 
   public static final class OIConstants {
@@ -109,5 +112,14 @@ public final class Constants {
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
         new TrapezoidProfile.Constraints(
             kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+  }
+
+  public static final class DRIVE {
+    public static final double MAX_SPEED_METERS_PER_SECOND = 0;
+    public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 0;
+    public static final SwerveDriveKinematics DRIVE_KINEMATICS = null;
+    public static final TrajectoryConstraint TRAJECTORY_VOLTAGE_CONSTRAINT = null;
+    public static final RamseteController TRAJECTORY_RAMSETE_CONTROLLER = null;
+    public static final SimpleMotorFeedforward TRAJECTORY_FEEDFORWARD = null;
   }
 }
