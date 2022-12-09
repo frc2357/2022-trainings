@@ -7,19 +7,29 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.swervedrivespecialties.swervelib.SwerveModule;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.trajectory.PathPlannerTrajectory;
 
 import static frc.robot.Constants.*;
 
@@ -87,6 +97,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
 
+  private SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(m_kinematics, getHeading());
+
   public static class Configuration {
     public double m_maxVoltage = 0;
     public double m_maxMetersPerSecond = 0;
@@ -143,6 +155,20 @@ public class DrivetrainSubsystem extends SubsystemBase {
     m_pigeon.reset();
   }
 
+  public void resetOdometry(Pose2d pose) {
+    resetEncoders();
+    m_odometry.resetPosition(pose, getHeading());
+  }
+
+  private Rotation2d getHeading() {
+    double x = 360 - m_pigeon.getYaw();
+    return Rotation2d.fromDegrees(x);
+  }
+
+  private void resetEncoders() {
+    //TODO: Figure this out
+  }
+
   public Rotation2d getGyroscopeRotation() {
     return Rotation2d.fromDegrees(m_pigeon.getYaw());
   }
@@ -175,4 +201,30 @@ public class DrivetrainSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
 
   }
+
+  public SequentialCommandGroup followPathCommand(final boolean shouldResetOdometry, String trajectoryFileName) {
+    final PathPlannerTrajectory trajectory = PathPlanner.loadPath(trajectoryFileName, 3.5, 3);
+
+    return new InstantCommand(() -> {
+      if (shouldResetOdometry) {
+        PathPlannerState initialSample = (PathPlannerState) trajectory.sample(0);
+        Pose2d initialPose = new Pose2d(initialSample.poseMeters.getTranslation(), initialSample.holonomicRotation);
+        m_odometry.resetPosition(initialPose, getHeading());
+      }
+    //TODO: Create xController, yController, and thetaController
+    }).andThen(new PPSwerveControllerCommand(
+      trajectory,
+      () -> getPose(),
+      m_kinematics,
+      (SwerveModuleState[] moduleStates) -> {
+        drive(m_kinematics.toChassisSpeeds(moduleStates));
+      },
+      this
+    )).andThen(() -> drive(new ChassisSpeeds()), this);
+  }
+
+  private Object getPose() {
+    return m_odometry.getPoseMeters();
+  }
+
 }
