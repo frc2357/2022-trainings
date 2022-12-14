@@ -13,6 +13,8 @@ import frc.robot.commands.DefaultDriveCommand;
 import frc.robot.controls.DriveControls;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.SubSystemFactory;
+import frc.robot.util.AvailableTrajectories;
+
 import static frc.robot.Constants.*;
 
 /**
@@ -46,6 +48,8 @@ public class RobotContainer {
         m_drivetrainSubsystem,
         controls));
 
+    AvailableTrajectories.generateTrajectories();
+
     // Configure the button bindings
     configureButtonBindings();
   }
@@ -71,7 +75,18 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An ExampleCommand will run in autonomous
-    return new InstantCommand();
+    int auto = -1;
+
+    switch(auto){
+      case 1:
+        return AvailableTrajectories.exampleTrajectory;
+      case 2:
+        return AvailableTrajectories.exampleRecordPathTrajectory;
+      default:
+        System.out.println("Default getAutoCommand");
+        System.out.println(AvailableTrajectories.exampleTrajectory);
+        return AvailableTrajectories.exampleTrajectory;
+      // return m_autoCommandChooser.generateCommand();
+    }
   }
 }
