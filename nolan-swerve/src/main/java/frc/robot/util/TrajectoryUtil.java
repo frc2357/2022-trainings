@@ -63,7 +63,7 @@ public class TrajectoryUtil {
         // System.out.print("getTrajectoryConfig(reversed): ");
         // System.out.println(getTrajectoryConfig(reversed));
 
-        System.out.println(Constants.DRIVE.TRAJECTORY_FEEDFORWARD);
+        // System.out.println(Constants.DRIVE.TRAJECTORY_FEEDFORWARD);
 
 
         Trajectory trajectory = TrajectoryGenerator.generateTrajectory(start, middle, end,
@@ -94,14 +94,16 @@ public class TrajectoryUtil {
     public static RamseteCommand createRamseteCommand(DrivetrainSubsystem driveSub, Trajectory trajectory) {
         return new RamseteCommand(trajectory,
             () -> driveSub.getPose(),
-            Constants.TRAJECTORY_RAMSETE_CONTROLLER,
-            Constants.TRAJECTORY_FEEDFORWARD,
-            Constants.DRIVE_KINEMATICS,
+            Constants.DRIVE.TRAJECTORY_RAMSETE_CONTROLLER,
+            Constants.DRIVE.TRAJECTORY_FEEDFORWARD,
+            Constants.DRIVE.TANK_DRIVE_KINEMATICS,
             () -> driveSub.getWheelSpeeds(),
-            Constants.TRAJECTORY_DRIVE_PID,
-            Constants.TRAJECTORY_DRIVE_PID,
+            Constants.DRIVE.TRAJECTORY_DRIVE_PID,
+            Constants.DRIVE.TRAJECTORY_DRIVE_PID,
             (leftVolts, rightVolts) -> driveSub.setTankDriveVolts(leftVolts, rightVolts),
             driveSub
         );
+
+        
     }
 }

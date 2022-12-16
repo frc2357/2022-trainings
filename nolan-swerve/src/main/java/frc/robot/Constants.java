@@ -4,7 +4,9 @@
 
 package frc.robot;
 
+import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
+import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper.GearRatio;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.RamseteController;
@@ -34,6 +36,8 @@ public final class Constants {
      * Should be measured from center to center.
      */
     public static final double DRIVETRAIN_TRACKWIDTH_METERS = .60325;
+    public static final double WHEEL_DIAMETER = SdsModuleConfigurations.MK4I_L2.getWheelDiameter();
+    public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER*Math.PI;
     /**
      * The front-to-back distance between the drivetrain wheels.
      *
@@ -66,11 +70,6 @@ public final class Constants {
     public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 22;
     public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(9.45); // FIXME Measure and set back
                                                                                        // right steer offset
-    public static final RamseteController TRAJECTORY_RAMSETE_CONTROLLER = null;
-    public static final SimpleMotorFeedforward TRAJECTORY_FEEDFORWARD = null;
-    public static final DifferentialDriveKinematics DRIVE_KINEMATICS = null;
-    public static final PIDController TRAJECTORY_DRIVE_PID = null;
-
     public static DrivetrainSubsystem.Configuration GET_SWERVE_DRIVE_CONFIG() {
         DrivetrainSubsystem.Configuration config = new DrivetrainSubsystem.Configuration();
 
@@ -87,6 +86,9 @@ public final class Constants {
     }
 
     public static final class DRIVE {
+        public static final double GEAR_RATIO = Mk4iSwerveModuleHelper.GearRatio.L2.getConfiguration().getDriveReduction();
+        public static final double ENCODER_CLICKS_PER_ROTATION = 2048 / GEAR_RATIO;
+
         public static final SimpleMotorFeedforward TRAJECTORY_FEEDFORWARD = new SimpleMotorFeedforward(
             Constants.DRIVE.KS_VOLTS,
             Constants.DRIVE.KV_VOLTS_SECONDS_PER_METER,
@@ -97,14 +99,14 @@ public final class Constants {
         public static final double DRIVETRAIN_PTHETA_CONTROLLER = 0.0;
         public static final double MAX_VOLTAGE = 12.0;
 
-        public static final double MAX_SPEED_METERS_PER_SECOND = 0;
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 0;
+        public static final double MAX_SPEED_METERS_PER_SECOND = 2;
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 1;
         public static final double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND = 0;
         public static final double MAX_ANGULAR_ACCELERATION_RADIANS_PER_SECOND_SQUARED = 0;
         public static final DifferentialDriveKinematics TANK_DRIVE_KINEMATICS = new DifferentialDriveKinematics(
             DRIVETRAIN_TRACKWIDTH_METERS);;
         
-        public static final SwerveDriveKinematics DRIVE_KINEMATICS = null;
+        // public static final SwerveDriveKinematics DRIVE_KINEMATICS = null;
         public static final TrajectoryConstraint TRAJECTORY_VOLTAGE_CONSTRAINT = new DifferentialDriveVoltageConstraint(
             TRAJECTORY_FEEDFORWARD,
             TANK_DRIVE_KINEMATICS,
@@ -116,10 +118,10 @@ public final class Constants {
         public static final RamseteController TRAJECTORY_RAMSETE_CONTROLLER = new RamseteController(
             Constants.DRIVE.RAMSETE_B, Constants.DRIVE.RAMSETE_ZETA);;
         private static final double KS_VOLTS = 0.6596;
-        private static final double KV_VOLTS_SECONDS_PER_METER = 0.014417;
-        private static final double KA_VOLTS_SECONDS_SQUARED_PER_METER = 0.0022178;
+        private static final double KV_VOLTS_SECONDS_PER_METER = 0.045739;
+        private static final double KA_VOLTS_SECONDS_SQUARED_PER_METER = 0.0070417;
         
-        private static final double P_DRIVE_VEL = 0.10371;
+        private static final double P_DRIVE_VEL = 0.56122;
         public static final PIDController TRAJECTORY_DRIVE_PID = new PIDController(Constants.DRIVE.P_DRIVE_VEL, 0, 0);
     }
 

@@ -1,0 +1,20 @@
+{
+  "SysId": {
+    "Analysis Type": "General Mechanism",
+    "Generator": {
+      "window": {
+        "visible": false
+      }
+    },
+    "Logger": {
+      "window": {
+        "visible": false
+      }
+    },
+    "Program Log": {
+      "window": {
+        "visible": false
+      }
+    }
+  }
+}

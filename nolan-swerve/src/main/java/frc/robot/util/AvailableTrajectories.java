@@ -25,10 +25,15 @@ public class AvailableTrajectories {
     }
 
     private static SequentialCommandGroup createExampleTrajectory() {
+        // return TrajectoryUtil.createTrajectoryPathCommand(DrivetrainSubsystem.getInstance(),
+        //         new Pose2d(0, 0, new Rotation2d(0)),
+        //         List.of(new Translation2d(0.0,0.0)),
+        //         new Pose2d(3, 0, new Rotation2d(0)), false, true);
         return TrajectoryUtil.createTrajectoryPathCommand(DrivetrainSubsystem.getInstance(),
-                new Pose2d(0, 0, new Rotation2d(0)),
-                List.of(new Translation2d(0.0,0.0)),
-                new Pose2d(3, 0, new Rotation2d(0)), false, true);
+                        new Pose2d(0, 0, new Rotation2d(0)),
+                        List.of(new Translation2d(1.0,0.0), new Translation2d(2.0,0.0)),
+                        new Pose2d(3, 0, new Rotation2d(0)),
+                        false, true);
     }
 
     private static SequentialCommandGroup createExampleRecordPathTrajectory() {

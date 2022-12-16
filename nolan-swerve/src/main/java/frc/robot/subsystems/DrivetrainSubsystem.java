@@ -21,6 +21,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -100,6 +101,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
   // FIXME Remove if you are using a Pigeon
   private final WPI_Pigeon2 m_pigeon = new WPI_Pigeon2(Constants.DRIVETRAIN_PIGEON_ID);
 
+  private final WPI_TalonFX m_frontLeftDriveMotor;
+  private final WPI_TalonFX m_frontRightDriveMotor;
+  private final WPI_TalonFX m_backLeftDriveMotor;
+  private final WPI_TalonFX m_backRightDriveMotor;
+
   // These are our modules. We initialize them in the constructor.
   private final SwerveModule m_frontLeftModule;
   private final SwerveModule m_frontRightModule;
@@ -109,6 +115,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
   private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
 
   private SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(m_kinematics, getHeading());
+
+  private DifferentialDriveOdometry m_tankOdometry;
 
   private static PIDController m_xController;
   private static PIDController m_yController;
@@ -122,40 +130,27 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   public DrivetrainSubsystem(SwerveModule frontRightModule, SwerveModule backRightModule, SwerveModule frontLeftModule,
       SwerveModule backLeftModule, WPI_Pigeon2 pigeon2) {
-        m_instance = this;
+    m_instance = this;
 
-    // There are 4 methods you can call to create your swerve modules.
-    // The method you use depends on what motors you are using.
-    //
-    // Mk3SwerveModuleHelper.createFalcon500(...)
-    // Your module has two Falcon 500s on it. One for steering and one for driving.
-    //
-    // Mk3SwerveModuleHelper.createNeo(...)
-    // Your module has two NEOs on it. One for steering and one for driving.
-    //
-    // Mk3SwerveModuleHelper.createFalcon500Neo(...)
-    // Your module has a Falcon 500 and a NEO on it. The Falcon 500 is for driving
-    // and the NEO is for steering.
-    //
-    // Mk3SwerveModuleHelper.createNeoFalcon500(...)
-    // Your module has a NEO and a Falcon 500 on it. The NEO is for driving and the
-    // Falcon 500 is for steering.
-    //
-    // Similar helpers also exist for Mk4 modules using the Mk4SwerveModuleHelper
-    // class.
-
-    // By default we will use Falcon 500s in standard configuration. But if you use
-    // a different configuration or motors
-    // you MUST change it. If you do not, your code will crash on startup.
+    m_frontLeftDriveMotor = new WPI_TalonFX(Constants.FRONT_LEFT_MODULE_DRIVE_MOTOR);
+    m_frontRightDriveMotor = new WPI_TalonFX(Constants.FRONT_RIGHT_MODULE_DRIVE_MOTOR);
+    m_backLeftDriveMotor = new WPI_TalonFX(Constants.BACK_LEFT_MODULE_DRIVE_MOTOR);
+    m_backRightDriveMotor = new WPI_TalonFX(Constants.BACK_RIGHT_MODULE_DRIVE_MOTOR);
 
     m_frontLeftModule = frontLeftModule;
 
-    // We will do the same for the other modules
     m_frontRightModule = frontRightModule;
 
     m_backLeftModule = backLeftModule;
 
     m_backRightModule = backRightModule;
+
+    m_backLeftDriveMotor.follow(m_frontLeftDriveMotor);
+    m_backRightDriveMotor.follow(m_frontRightDriveMotor);
+
+    m_tankOdometry = new DifferentialDriveOdometry(getHeading());
+    resetEncoders();
+    m_tankOdometry.resetPosition(new Pose2d(0, 0, new Rotation2d(0)), getHeading());
   }
 
   public void Config(Configuration config) {
@@ -217,12 +212,18 @@ public class DrivetrainSubsystem extends SubsystemBase {
         states[0].angle.getRadians());
     m_frontRightModule.set(states[1].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE,
         states[1].angle.getRadians());
-    m_backLeftModule.set(states[2].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE,
-        states[2].angle.getRadians());
-    m_backRightModule.set(states[3].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE,
-        states[3].angle.getRadians());
+    // m_backLeftModule.set(states[0].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE,
+    //     states[2].angle.getRadians());
+    // m_backRightModule.set(states[1].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE,
+    //     states[3].angle.getRadians());
 
     SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
+    
+    m_odometry.update(getHeading(), states);
+    m_tankOdometry.update(getHeading(), getLeftDistance(), getLeftDistance());
+
+    SmartDashboard.putNumber("Pose Meters X", m_tankOdometry.getPoseMeters().getX());
+    SmartDashboard.putNumber("Pose Meters Y", m_tankOdometry.getPoseMeters().getY());
 
   }
 
@@ -255,7 +256,33 @@ public class DrivetrainSubsystem extends SubsystemBase {
   }
 
   public DifferentialDriveWheelSpeeds getWheelSpeeds() {
-    return null;
+    return new DifferentialDriveWheelSpeeds(getVelocityLeftEncoder(), getVelocityRightEncoder());
+  }
+
+  public double getVelocityLeftEncoder() {
+    double nativeSpeed = m_frontLeftDriveMotor.getSelectedSensorVelocity();
+    return clicksToMeters(nativeSpeed * 10);
+  }
+
+/**
+ * 
+ * @return The speed of the drive in meters per second
+ */
+  public double getVelocityRightEncoder() {
+    double nativeSpeed = m_frontRightDriveMotor.getSelectedSensorVelocity();
+    return clicksToMeters(nativeSpeed * 10);
+  }
+
+  public double clicksToMeters(double clicks) {
+    return (clicks / Constants.DRIVE.ENCODER_CLICKS_PER_ROTATION) * Constants.WHEEL_CIRCUMFERENCE;
+  }
+
+  public double getLeftDistance() {
+    return clicksToMeters(m_frontLeftDriveMotor.getSelectedSensorPosition());
+  }
+
+  public double getRightDistance() {
+      return clicksToMeters(m_frontRightDriveMotor.getSelectedSensorPosition());
   }
 
 }
