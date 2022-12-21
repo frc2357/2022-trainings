@@ -68,7 +68,7 @@ public class TrajectoryUtil {
 
         Trajectory trajectory = TrajectoryGenerator.generateTrajectory(start, middle, end,
                 getTrajectoryConfig(reversed));
-        System.out.println(trajectory);
+        // System.out.println(trajectory);
         return createDrivePathCommand(driveSub, trajectory, resetOdometry);
     }
 

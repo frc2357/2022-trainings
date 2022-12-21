@@ -113,7 +113,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
 
-  private SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(m_kinematics, getHeading());
+  // private SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(m_kinematics, getHeading());
 
   private DifferentialDriveOdometry m_tankOdometry;
 
@@ -147,9 +147,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
     m_backLeftDriveMotor.follow(m_frontLeftDriveMotor);
     m_backRightDriveMotor.follow(m_frontRightDriveMotor);
 
-    m_tankOdometry = new DifferentialDriveOdometry(getHeading());
+    m_tankOdometry = new DifferentialDriveOdometry(getHeading(), 0, 0);
     resetEncoders();
-    m_tankOdometry.resetPosition(new Pose2d(0, 0, new Rotation2d(0)), getHeading());
+    m_tankOdometry.resetPosition(getHeading(), 0.0, 0.0, new Pose2d(0, 0, new Rotation2d(0)));
   }
 
   public void Config(Configuration config) {
@@ -175,7 +175,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   public void resetOdometry(Pose2d pose) {
     resetEncoders();
-    m_odometry.resetPosition(pose, getHeading());
+    m_tankOdometry.resetPosition(getHeading(), 0, 0, pose);
   }
 
   private Rotation2d getHeading() {
@@ -252,7 +252,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
   // }
 
   public Pose2d getPose() {
-    return m_odometry.getPoseMeters();
+    return m_tankOdometry.getPoseMeters();
   }
 
   public DifferentialDriveWheelSpeeds getWheelSpeeds() {
