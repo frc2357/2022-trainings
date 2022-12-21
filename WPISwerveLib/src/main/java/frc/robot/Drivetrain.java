@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.sensors.WPI_Pigeon2;
+
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -20,17 +22,17 @@ public class Drivetrain {
   public static final double kMaxSpeed = 3.0; // 3 meters per second
   public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
 
-  private final Translation2d m_frontLeftLocation = new Translation2d(0.381, 0.381);
-  private final Translation2d m_frontRightLocation = new Translation2d(0.381, -0.381);
-  private final Translation2d m_backLeftLocation = new Translation2d(-0.381, 0.381);
-  private final Translation2d m_backRightLocation = new Translation2d(-0.381, -0.381);
+  private final Translation2d m_frontLeftLocation = new Translation2d(0.314325, 0.301625);
+  private final Translation2d m_frontRightLocation = new Translation2d(0.314325, -0.301625);
+  private final Translation2d m_backLeftLocation = new Translation2d(-0.314325, 0.301625);
+  private final Translation2d m_backRightLocation = new Translation2d(-0.314325, -0.301625);
 
-  private final SwerveModule m_frontLeft = new SwerveModule(1, 2, 0, 1, 2, 3);
-  private final SwerveModule m_frontRight = new SwerveModule(3, 4, 4, 5, 6, 7);
-  private final SwerveModule m_backLeft = new SwerveModule(5, 6, 8, 9, 10, 11);
-  private final SwerveModule m_backRight = new SwerveModule(7, 8, 12, 13, 14, 15);
+  private final FalconSwerveModule m_frontLeft = new FalconSwerveModule(Constants.CAN_ID.FRONT_LEFT_MODULE_DRIVE_MOTOR, Constants.CAN_ID.FRONT_LEFT_MODULE_STEER_MOTOR, Constants.CAN_ID.FRONT_LEFT_MODULE_STEER_ENCODER);
+  private final FalconSwerveModule m_frontRight = new FalconSwerveModule(Constants.CAN_ID.FRONT_RIGHT_MODULE_DRIVE_MOTOR, Constants.CAN_ID.FRONT_RIGHT_MODULE_STEER_MOTOR, Constants.CAN_ID.FRONT_RIGHT_MODULE_STEER_ENCODER);
+  private final FalconSwerveModule m_backLeft = new FalconSwerveModule(Constants.CAN_ID.BACK_LEFT_MODULE_DRIVE_MOTOR, Constants.CAN_ID.BACK_LEFT_MODULE_STEER_MOTOR, Constants.CAN_ID.BACK_LEFT_MODULE_STEER_ENCODER);
+  private final FalconSwerveModule m_backRight = new FalconSwerveModule(Constants.CAN_ID.BACK_RIGHT_MODULE_DRIVE_MOTOR, Constants.CAN_ID.BACK_RIGHT_MODULE_STEER_MOTOR, Constants.CAN_ID.BACK_RIGHT_MODULE_STEER_ENCODER);
 
-  private final AnalogGyro m_gyro = new AnalogGyro(0);
+  private final WPI_Pigeon2 m_gyro = new WPI_Pigeon2(5);
 
   private final SwerveDriveKinematics m_kinematics =
       new SwerveDriveKinematics(
@@ -71,6 +73,19 @@ public class Drivetrain {
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d())
                 : new ChassisSpeeds(xSpeed, ySpeed, rot));
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, kMaxSpeed);
+
+    // System.out.println("Front Left: ");
+    // System.out.println(swerveModuleStates[0]);
+    
+    // System.out.println("Front Right: ");
+    // System.out.println(swerveModuleStates[1]);
+    
+    // System.out.println("Back Left: ");
+    // System.out.println(swerveModuleStates[2]);
+    
+    // System.out.println("Back Right: ");
+    // System.out.println(swerveModuleStates[3]);
+    
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_backLeft.setDesiredState(swerveModuleStates[2]);
