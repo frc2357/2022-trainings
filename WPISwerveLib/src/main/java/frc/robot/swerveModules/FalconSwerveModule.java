@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.swerveModules;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import frc.robot.subsystems.Drivetrain;
 
 public class FalconSwerveModule {
     private static final double gearRatio = (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0);
@@ -54,23 +55,23 @@ public class FalconSwerveModule {
 
     public SwerveModuleState getState() {
         return new SwerveModuleState(
-            getVelocity(), Rotation2d.fromDegrees(m_canCoder.getPosition())
+            getVelocity(), Rotation2d.fromDegrees(m_canCoder.getAbsolutePosition())
         );
     }
 
     public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(
-            clicksToMeters(m_driveMotor.getSelectedSensorPosition()), Rotation2d.fromDegrees(m_canCoder.getPosition())
+            clicksToMeters(m_driveMotor.getSelectedSensorPosition()), Rotation2d.fromDegrees(m_canCoder.getAbsolutePosition())
         );
     }
 
     public void setDesiredState(SwerveModuleState desiredState) {
-        SwerveModuleState state = SwerveModuleState.optimize(desiredState, Rotation2d.fromDegrees(m_canCoder.getPosition()));
+        SwerveModuleState state = SwerveModuleState.optimize(desiredState, Rotation2d.fromDegrees(m_canCoder.getAbsolutePosition()));
 
         final double driveOutput = m_drivePIDController.calculate(getVelocity(), state.speedMetersPerSecond);
         final double driveFeedforward = m_driveFeedforward.calculate(state.speedMetersPerSecond);
 
-        final double turnOutput = m_turningPIDController.calculate(Math.toRadians(m_canCoder.getPosition()), state.angle.getRadians());
+        final double turnOutput = m_turningPIDController.calculate(Math.toRadians(m_canCoder.getAbsolutePosition()), state.angle.getRadians());
         final double turnFeedforward = m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity);
 
         m_driveMotor.setVoltage(driveOutput + driveFeedforward);
@@ -84,5 +85,14 @@ public class FalconSwerveModule {
     public double getVelocity() {
         double nativeSpeed = m_driveMotor.getSelectedSensorVelocity();
         return clicksToMeters(nativeSpeed * 10);
+    }
+
+    // Debugging functions
+    public double getRotationDegrees() {
+        return m_canCoder.getAbsolutePosition();
+    }
+
+    public double getDistanceInMeters() {
+        return clicksToMeters(m_driveMotor.getSelectedSensorPosition());
     }
 }
