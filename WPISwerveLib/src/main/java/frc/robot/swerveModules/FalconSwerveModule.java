@@ -16,7 +16,7 @@ public class FalconSwerveModule {
     private static final double gearRatio = (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0);
     private static final double kWheelDiameter = 0.10033;
     private static final double kWheelCircumference = kWheelDiameter * Math.PI;
-    private static final double kEncoderResolution = 2048 * gearRatio;
+    private static final double encoderClicksPerRotation = 2048 * (1/gearRatio);
 
     private static final double kModuleMaxAngularVelocity = Drivetrain.kMaxAngularSpeed;
     private static final double kModuleMaxAngularAcceleration =
@@ -33,9 +33,9 @@ public class FalconSwerveModule {
     // Gains are for example purposes only - must be determined for your own robot!
     private final ProfiledPIDController m_turningPIDController =
         new ProfiledPIDController(
-            1,
+            0.2,
             0,
-            0,
+            0.1,
             new TrapezoidProfile.Constraints(
                 kModuleMaxAngularVelocity, kModuleMaxAngularAcceleration));
   
@@ -79,7 +79,7 @@ public class FalconSwerveModule {
     }
 
     public double clicksToMeters(double clicks) {
-        return (clicks / kEncoderResolution) * kWheelCircumference;
+        return (clicks / encoderClicksPerRotation) * kWheelCircumference;
     }
 
     public double getVelocity() {
@@ -94,5 +94,9 @@ public class FalconSwerveModule {
 
     public double getDistanceInMeters() {
         return clicksToMeters(m_driveMotor.getSelectedSensorPosition());
+    }
+
+    public double getClicks() {
+        return m_driveMotor.getSelectedSensorPosition();
     }
 }

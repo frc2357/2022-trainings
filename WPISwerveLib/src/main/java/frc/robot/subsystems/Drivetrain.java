@@ -14,9 +14,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -24,7 +22,7 @@ import frc.robot.ExampleGlobalMeasurementSensor;
 import frc.robot.swerveModules.FalconSwerveModule;
 
 /** Represents a swerve drive style drivetrain. */
-public class Drivetrain extends SubsystemBase{
+public class Drivetrain extends SubsystemBase {
   public static final double kMaxSpeed = 3.0; // 3 meters per second
   public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
 
@@ -33,32 +31,38 @@ public class Drivetrain extends SubsystemBase{
   private final Translation2d m_backLeftLocation = new Translation2d(-0.314325, 0.301625);
   private final Translation2d m_backRightLocation = new Translation2d(-0.314325, -0.301625);
 
-  private final FalconSwerveModule m_frontLeft = new FalconSwerveModule(Constants.CAN_ID.FRONT_LEFT_MODULE_DRIVE_MOTOR, Constants.CAN_ID.FRONT_LEFT_MODULE_STEER_MOTOR, Constants.CAN_ID.FRONT_LEFT_MODULE_STEER_ENCODER);
-  private final FalconSwerveModule m_frontRight = new FalconSwerveModule(Constants.CAN_ID.FRONT_RIGHT_MODULE_DRIVE_MOTOR, Constants.CAN_ID.FRONT_RIGHT_MODULE_STEER_MOTOR, Constants.CAN_ID.FRONT_RIGHT_MODULE_STEER_ENCODER);
-  private final FalconSwerveModule m_backLeft = new FalconSwerveModule(Constants.CAN_ID.BACK_LEFT_MODULE_DRIVE_MOTOR, Constants.CAN_ID.BACK_LEFT_MODULE_STEER_MOTOR, Constants.CAN_ID.BACK_LEFT_MODULE_STEER_ENCODER);
-  private final FalconSwerveModule m_backRight = new FalconSwerveModule(Constants.CAN_ID.BACK_RIGHT_MODULE_DRIVE_MOTOR, Constants.CAN_ID.BACK_RIGHT_MODULE_STEER_MOTOR, Constants.CAN_ID.BACK_RIGHT_MODULE_STEER_ENCODER);
+  private final FalconSwerveModule m_frontLeft = new FalconSwerveModule(Constants.CAN_ID.FRONT_LEFT_MODULE_DRIVE_MOTOR,
+      Constants.CAN_ID.FRONT_LEFT_MODULE_STEER_MOTOR, Constants.CAN_ID.FRONT_LEFT_MODULE_STEER_ENCODER);
+  private final FalconSwerveModule m_frontRight = new FalconSwerveModule(
+      Constants.CAN_ID.FRONT_RIGHT_MODULE_DRIVE_MOTOR, Constants.CAN_ID.FRONT_RIGHT_MODULE_STEER_MOTOR,
+      Constants.CAN_ID.FRONT_RIGHT_MODULE_STEER_ENCODER);
+  private final FalconSwerveModule m_backLeft = new FalconSwerveModule(Constants.CAN_ID.BACK_LEFT_MODULE_DRIVE_MOTOR,
+      Constants.CAN_ID.BACK_LEFT_MODULE_STEER_MOTOR, Constants.CAN_ID.BACK_LEFT_MODULE_STEER_ENCODER);
+  private final FalconSwerveModule m_backRight = new FalconSwerveModule(Constants.CAN_ID.BACK_RIGHT_MODULE_DRIVE_MOTOR,
+      Constants.CAN_ID.BACK_RIGHT_MODULE_STEER_MOTOR, Constants.CAN_ID.BACK_RIGHT_MODULE_STEER_ENCODER);
 
   private final WPI_Pigeon2 m_gyro = new WPI_Pigeon2(5);
 
-  private final SwerveDriveKinematics m_kinematics =
-      new SwerveDriveKinematics(
-          m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
+  private final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
+      m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
 
-  /* Here we use SwerveDrivePoseEstimator so that we can fuse odometry readings. The numbers used
-  below are robot specific, and should be tuned. */
-  private final SwerveDrivePoseEstimator m_poseEstimator =
-      new SwerveDrivePoseEstimator(
-          m_kinematics,
-          m_gyro.getRotation2d(),
-          new SwerveModulePosition[] {
-            m_frontLeft.getPosition(),
-            m_frontRight.getPosition(),
-            m_backLeft.getPosition(),
-            m_backRight.getPosition()
-          },
-          new Pose2d(),
-          VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
-          VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
+  /*
+   * Here we use SwerveDrivePoseEstimator so that we can fuse odometry readings.
+   * The numbers used
+   * below are robot specific, and should be tuned.
+   */
+  private final SwerveDrivePoseEstimator m_poseEstimator = new SwerveDrivePoseEstimator(
+      m_kinematics,
+      m_gyro.getRotation2d(),
+      new SwerveModulePosition[] {
+          m_frontLeft.getPosition(),
+          m_frontRight.getPosition(),
+          m_backLeft.getPosition(),
+          m_backRight.getPosition()
+      },
+      new Pose2d(),
+      VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
+      VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
 
   public Drivetrain() {
     m_gyro.reset();
@@ -67,32 +71,32 @@ public class Drivetrain extends SubsystemBase{
   /**
    * Method to drive the robot using joystick info.
    *
-   * @param xSpeed Speed of the robot in the x direction (forward).
-   * @param ySpeed Speed of the robot in the y direction (sideways).
-   * @param rot Angular rate of the robot.
-   * @param fieldRelative Whether the provided x and y speeds are relative to the field.
+   * @param xSpeed        Speed of the robot in the x direction (forward).
+   * @param ySpeed        Speed of the robot in the y direction (sideways).
+   * @param rot           Angular rate of the robot.
+   * @param fieldRelative Whether the provided x and y speeds are relative to the
+   *                      field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    var swerveModuleStates =
-        m_kinematics.toSwerveModuleStates(
-            fieldRelative
-                ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d())
-                : new ChassisSpeeds(xSpeed, ySpeed, rot));
+    var swerveModuleStates = m_kinematics.toSwerveModuleStates(
+        fieldRelative
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d())
+            : new ChassisSpeeds(xSpeed, ySpeed, rot));
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, kMaxSpeed);
 
-    // System.out.println("Front Left: ");
-    // System.out.println(swerveModuleStates[0]);
-    
-    // System.out.println("Front Right: ");
-    // System.out.println(swerveModuleStates[1]);
-    
-    // System.out.println("Back Left: ");
-    // System.out.println(swerveModuleStates[2]);
-    
-    // System.out.println("Back Right: ");
-    // System.out.println(swerveModuleStates[3]);
-    
-    m_frontLeft.setDesiredState(swerveModuleStates[0]);
+    System.out.println("Front Left: ");
+    System.out.println(swerveModuleStates[0]);
+
+    System.out.println("Front Right: ");
+    System.out.println(swerveModuleStates[1]);
+
+    System.out.println("Back Left: ");
+    System.out.println(swerveModuleStates[2]);
+
+    System.out.println("Back Right: ");
+    System.out.println(swerveModuleStates[3]);
+
+    //m_frontLeft.setDesiredState(swerveModuleStates[0]);
     // m_frontRight.setDesiredState(swerveModuleStates[1]);
     // m_backLeft.setDesiredState(swerveModuleStates[2]);
     // m_backRight.setDesiredState(swerveModuleStates[3]);
@@ -103,13 +107,14 @@ public class Drivetrain extends SubsystemBase{
     m_poseEstimator.update(
         m_gyro.getRotation2d(),
         new SwerveModulePosition[] {
-          m_frontLeft.getPosition(),
-          m_frontRight.getPosition(),
-          m_backLeft.getPosition(),
-          m_backRight.getPosition()
+            m_frontLeft.getPosition(),
+            m_frontRight.getPosition(),
+            m_backLeft.getPosition(),
+            m_backRight.getPosition()
         });
 
-    // Also apply vision measurements. We use 0.3 seconds in the past as an example -- on
+    // Also apply vision measurements. We use 0.3 seconds in the past as an example
+    // -- on
     // a real robot, this must be calculated based either on latency or timestamps.
     m_poseEstimator.addVisionMeasurement(
         ExampleGlobalMeasurementSensor.getEstimatedGlobalPose(
@@ -119,15 +124,18 @@ public class Drivetrain extends SubsystemBase{
 
   @Override
   public void periodic() {
+    updateOdometry();
+
     SmartDashboard.putNumber("front Left Rot", m_frontLeft.getRotationDegrees());
-    SmartDashboard.putNumber("front left speed", m_frontLeft.getDistanceInMeters());
-  
+    SmartDashboard.putNumber("front left speed", m_frontLeft.getClicks());
+
     SmartDashboard.putNumber("front right Rot", m_frontRight.getRotationDegrees());
-    SmartDashboard.putNumber("front right speed", m_frontRight.getDistanceInMeters());
+    SmartDashboard.putNumber("front right speed", m_frontRight.getClicks());
 
     SmartDashboard.putNumber("Back Left Rot", m_backLeft.getRotationDegrees());
-    SmartDashboard.putNumber("Back left speed", m_backLeft.getDistanceInMeters());
-    
+    SmartDashboard.putNumber("Back left speed", m_backLeft.getClicks());
+
     SmartDashboard.putNumber("Back right Rot", m_backRight.getRotationDegrees());
-    SmartDashboard.putNumber("Back right speed", m_backRight.getDistanceInMeters());}
+    SmartDashboard.putNumber("Back right speed", m_backRight.getClicks());
+  }
 }

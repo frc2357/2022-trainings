@@ -34,7 +34,7 @@ public class SwerveDriveCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        m_drive.drive(0, 0, 0, true);
+        m_drive.drive(0, 0, 0, false);
     }
 
     private void driveWithJoystick(boolean fieldRelative) {
