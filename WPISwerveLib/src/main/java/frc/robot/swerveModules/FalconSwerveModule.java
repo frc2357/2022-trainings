@@ -48,8 +48,9 @@ public class FalconSwerveModule {
     private static final double m_driveVelF = (1023.0 / 20660.0) + 0.00;
     private static final double m_turnVelF = (1023.0 / 20660.0) + 0.00;
 
+    //TODO: verify pid values
     // PID calculated from SysID tool
-    private static final double m_driveVelP = 0.00069903;
+    private static final double m_driveVelP = 0.00071716;
     private static final double m_driveVelI = 0.0;
     private static final double m_driveVelD = 0.0;
 
