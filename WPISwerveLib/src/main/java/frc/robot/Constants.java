@@ -26,5 +26,19 @@ public final class Constants {
         public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(135.08);
         public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(125);
         public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(9.45);
+
+        /**
+         * The left-to-right distance between the drivetrain wheels
+         *
+         * Should be measured from center to center.
+         */
+        public static final double DRIVETRAIN_TRACKWIDTH_METERS = .60325;
+        /**
+         * The front-to-back distance between the drivetrain wheels.
+         *
+         * Should be measured from center to center.
+         */
+        public static final double DRIVETRAIN_WHEELBASE_METERS = .62865;
+
     }
 }

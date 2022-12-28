@@ -27,11 +27,6 @@ public class Drivetrain extends SubsystemBase {
   public static final double kMaxSpeed = 3.0; // 3 meters per second
   public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
 
-  private final Translation2d m_frontLeftLocation = new Translation2d(0.314325, 0.301625);
-  private final Translation2d m_frontRightLocation = new Translation2d(0.314325, -0.301625);
-  private final Translation2d m_backLeftLocation = new Translation2d(-0.314325, 0.301625);
-  private final Translation2d m_backRightLocation = new Translation2d(-0.314325, -0.301625);
-
   private final FalconSwerveModule m_frontLeft = new FalconSwerveModule(Constants.CAN_ID.FRONT_LEFT_MODULE_DRIVE_MOTOR,
       Constants.CAN_ID.FRONT_LEFT_MODULE_STEER_MOTOR, Constants.CAN_ID.FRONT_LEFT_MODULE_STEER_ENCODER);
   private final FalconSwerveModule m_frontRight = new FalconSwerveModule(
@@ -45,7 +40,14 @@ public class Drivetrain extends SubsystemBase {
   private final WPI_Pigeon2 m_gyro = new WPI_Pigeon2(5);
 
   private final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
-      m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
+    // Front left
+    new Translation2d(Constants.SWERVE.DRIVETRAIN_TRACKWIDTH_METERS / 2.0, Constants.SWERVE.DRIVETRAIN_WHEELBASE_METERS / 2.0),
+    // Front right
+    new Translation2d(Constants.SWERVE.DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -Constants.SWERVE.DRIVETRAIN_WHEELBASE_METERS / 2.0),
+    // Back left
+    new Translation2d(-Constants.SWERVE.DRIVETRAIN_TRACKWIDTH_METERS / 2.0, Constants.SWERVE.DRIVETRAIN_WHEELBASE_METERS / 2.0),
+    // Back right
+    new Translation2d(-Constants.SWERVE.DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -Constants.SWERVE.DRIVETRAIN_WHEELBASE_METERS / 2.0));
 
   /*
    * Here we use SwerveDrivePoseEstimator so that we can fuse odometry readings.
