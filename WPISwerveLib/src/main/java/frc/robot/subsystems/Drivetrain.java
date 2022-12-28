@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -78,25 +79,31 @@ public class Drivetrain extends SubsystemBase {
    *                      field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    var swerveModuleStates = m_kinematics.toSwerveModuleStates(
+
+    SmartDashboard.putNumber("xSpeed", xSpeed);
+    SmartDashboard.putNumber("ySpeed", ySpeed);
+    SmartDashboard.putNumber("rotation", rot);
+    SwerveModuleState[] swerveModuleStates = m_kinematics.toSwerveModuleStates(
         fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d())
             : new ChassisSpeeds(xSpeed, ySpeed, rot));
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, kMaxSpeed);
 
-    System.out.println("Front Left: ");
-    System.out.println(swerveModuleStates[0]);
+    SmartDashboard.putString("Front left desired state", swerveModuleStates[0].toString());
 
-    System.out.println("Front Right: ");
-    System.out.println(swerveModuleStates[1]);
+    // System.out.println("Front Left: ");
+    // System.out.println(swerveModuleStates[0]);
 
-    System.out.println("Back Left: ");
-    System.out.println(swerveModuleStates[2]);
+    // System.out.println("Front Right: ");
+    // System.out.println(swerveModuleStates[1]);
 
-    System.out.println("Back Right: ");
-    System.out.println(swerveModuleStates[3]);
+    // System.out.println("Back Left: ");
+    // System.out.println(swerveModuleStates[2]);
 
-    //m_frontLeft.setDesiredState(swerveModuleStates[0]);
+    // System.out.println("Back Right: ");
+    // System.out.println(swerveModuleStates[3]);
+
+    m_frontLeft.setDesiredState(swerveModuleStates[0]);
     // m_frontRight.setDesiredState(swerveModuleStates[1]);
     // m_backLeft.setDesiredState(swerveModuleStates[2]);
     // m_backRight.setDesiredState(swerveModuleStates[3]);
@@ -127,15 +134,15 @@ public class Drivetrain extends SubsystemBase {
     updateOdometry();
 
     SmartDashboard.putNumber("front Left Rot", m_frontLeft.getRotationDegrees());
-    SmartDashboard.putNumber("front left speed", m_frontLeft.getClicks());
+    SmartDashboard.putNumber("front left meters per second", m_frontLeft.getVelocity());
 
     SmartDashboard.putNumber("front right Rot", m_frontRight.getRotationDegrees());
-    SmartDashboard.putNumber("front right speed", m_frontRight.getClicks());
+    SmartDashboard.putNumber("front right meters per second", m_frontRight.getVelocity());
 
     SmartDashboard.putNumber("Back Left Rot", m_backLeft.getRotationDegrees());
-    SmartDashboard.putNumber("Back left speed", m_backLeft.getClicks());
+    SmartDashboard.putNumber("Back left meters per second", m_backLeft.getVelocity());
 
     SmartDashboard.putNumber("Back right Rot", m_backRight.getRotationDegrees());
-    SmartDashboard.putNumber("Back right speed", m_backRight.getClicks());
+    SmartDashboard.putNumber("Back right meters per second", m_backRight.getVelocity());
   }
 }
