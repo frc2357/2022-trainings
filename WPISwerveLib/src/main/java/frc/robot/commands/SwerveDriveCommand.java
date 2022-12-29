@@ -26,7 +26,7 @@ public class SwerveDriveCommand extends CommandBase {
 
     @Override
     public void execute() {
-        driveWithJoystick(true);
+        driveWithJoystick(false);
     }
 
     @Override

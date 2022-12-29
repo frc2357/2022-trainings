@@ -28,14 +28,14 @@ public class Drivetrain extends SubsystemBase {
   public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
 
   private final FalconSwerveModule m_frontLeft = new FalconSwerveModule(Constants.CAN_ID.FRONT_LEFT_MODULE_DRIVE_MOTOR,
-      Constants.CAN_ID.FRONT_LEFT_MODULE_STEER_MOTOR, Constants.CAN_ID.FRONT_LEFT_MODULE_STEER_ENCODER);
+      Constants.CAN_ID.FRONT_LEFT_MODULE_STEER_MOTOR, Constants.CAN_ID.FRONT_LEFT_MODULE_STEER_ENCODER, Constants.SWERVE.FRONT_LEFT_MODULE_STEER_OFFSET);
   private final FalconSwerveModule m_frontRight = new FalconSwerveModule(
       Constants.CAN_ID.FRONT_RIGHT_MODULE_DRIVE_MOTOR, Constants.CAN_ID.FRONT_RIGHT_MODULE_STEER_MOTOR,
-      Constants.CAN_ID.FRONT_RIGHT_MODULE_STEER_ENCODER);
+      Constants.CAN_ID.FRONT_RIGHT_MODULE_STEER_ENCODER, Constants.SWERVE.FRONT_RIGHT_MODULE_STEER_OFFSET);
   private final FalconSwerveModule m_backLeft = new FalconSwerveModule(Constants.CAN_ID.BACK_LEFT_MODULE_DRIVE_MOTOR,
-      Constants.CAN_ID.BACK_LEFT_MODULE_STEER_MOTOR, Constants.CAN_ID.BACK_LEFT_MODULE_STEER_ENCODER);
+      Constants.CAN_ID.BACK_LEFT_MODULE_STEER_MOTOR, Constants.CAN_ID.BACK_LEFT_MODULE_STEER_ENCODER, Constants.SWERVE.BACK_LEFT_MODULE_STEER_OFFSET);
   private final FalconSwerveModule m_backRight = new FalconSwerveModule(Constants.CAN_ID.BACK_RIGHT_MODULE_DRIVE_MOTOR,
-      Constants.CAN_ID.BACK_RIGHT_MODULE_STEER_MOTOR, Constants.CAN_ID.BACK_RIGHT_MODULE_STEER_ENCODER);
+      Constants.CAN_ID.BACK_RIGHT_MODULE_STEER_MOTOR, Constants.CAN_ID.BACK_RIGHT_MODULE_STEER_ENCODER, Constants.SWERVE.BACK_RIGHT_MODULE_STEER_OFFSET);
 
   private final WPI_Pigeon2 m_gyro = new WPI_Pigeon2(5);
 
@@ -92,9 +92,10 @@ public class Drivetrain extends SubsystemBase {
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, kMaxSpeed);
 
     SmartDashboard.putString("Front left desired state", swerveModuleStates[0].toString());
+    m_frontLeft.rotationTarget(swerveModuleStates[0].angle.getRadians());
 
-    // System.out.println("Front Left: ");
-    // System.out.println(swerveModuleStates[0]);
+    //System.out.println("Front Left: ");
+    //System.out.println(swerveModuleStates[0]);
 
     // System.out.println("Front Right: ");
     // System.out.println(swerveModuleStates[1]);
@@ -106,9 +107,9 @@ public class Drivetrain extends SubsystemBase {
     // System.out.println(swerveModuleStates[3]);
 
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
-    // m_frontRight.setDesiredState(swerveModuleStates[1]);
-    // m_backLeft.setDesiredState(swerveModuleStates[2]);
-    // m_backRight.setDesiredState(swerveModuleStates[3]);
+    m_frontRight.setDesiredState(swerveModuleStates[1]);
+    m_backLeft.setDesiredState(swerveModuleStates[2]);
+    m_backRight.setDesiredState(swerveModuleStates[3]);
   }
 
   /** Updates the field relative position of the robot. */
@@ -137,14 +138,15 @@ public class Drivetrain extends SubsystemBase {
 
     SmartDashboard.putNumber("front Left Rot", m_frontLeft.getRotationDegrees());
     SmartDashboard.putNumber("front left meters per second", m_frontLeft.getVelocity());
+    m_frontLeft.getRotationCurrent();
 
-    SmartDashboard.putNumber("front right Rot", m_frontRight.getRotationDegrees());
-    SmartDashboard.putNumber("front right meters per second", m_frontRight.getVelocity());
+    // SmartDashboard.putNumber("front right Rot", m_frontRight.getRotationDegrees());
+    // SmartDashboard.putNumber("front right meters per second", m_frontRight.getVelocity());
 
-    SmartDashboard.putNumber("Back Left Rot", m_backLeft.getRotationDegrees());
-    SmartDashboard.putNumber("Back left meters per second", m_backLeft.getVelocity());
+    // SmartDashboard.putNumber("Back Left Rot", m_backLeft.getRotationDegrees());
+    // SmartDashboard.putNumber("Back left meters per second", m_backLeft.getVelocity());
 
-    SmartDashboard.putNumber("Back right Rot", m_backRight.getRotationDegrees());
-    SmartDashboard.putNumber("Back right meters per second", m_backRight.getVelocity());
+    // SmartDashboard.putNumber("Back right Rot", m_backRight.getRotationDegrees());
+    // SmartDashboard.putNumber("Back right meters per second", m_backRight.getVelocity());
   }
 }
