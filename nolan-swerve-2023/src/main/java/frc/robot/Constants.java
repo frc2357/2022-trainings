@@ -13,6 +13,16 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+
+    /**
+     * The canbus the swerve modules are on
+     * 
+     * Use "" or "rio" for rio can bus
+     * 
+     * Use name of Canivore device to use Canivore
+     *  */ 
+    public static final String DRIVE_CANBUS = "rio";
+
     /**
      * The left-to-right distance between the drivetrain wheels
      *
