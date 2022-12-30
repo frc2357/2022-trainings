@@ -64,7 +64,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return new DrivetrainSubsystem().followPathCommand(true, "");
+    return m_drivetrainSubsystem.followPathCommand(true, "figure8");
   }
 
   private static double deadband(double value, double deadband) {

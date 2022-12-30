@@ -235,7 +235,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
   public SequentialCommandGroup followPathCommand(final boolean shouldResetOdometry, String trajectoryFileName) {
     
         // final Trajectory trajectory = generateTrajectory(waypoints);
-        final PathPlannerTrajectory trajectory = PathPlanner.loadPath(trajectoryFileName, 3.5, 3   );
+        final PathPlannerTrajectory trajectory = PathPlanner.loadPath(trajectoryFileName, 2, 3   );
         // double Seconds = 0.0;
         // System.out.println("===== Begin Sampling path =====");
         // while(trajectory.getTotalTimeSeconds() > Seconds) {
