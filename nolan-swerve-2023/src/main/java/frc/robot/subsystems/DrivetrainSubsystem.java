@@ -6,10 +6,15 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -22,6 +27,8 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static frc.robot.Constants.*;
@@ -84,6 +91,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
     private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
 
     private SwerveDriveOdometry m_odometry;
+
+    private static final PIDController m_xController = new PIDController(0, 0, 0);
+  private static final PIDController m_yController = new PIDController(0, 0, 0);
+  private static final PIDController m_thetaController = new PIDController(0, 0, 0);
 
     public DrivetrainSubsystem() {
       ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain");
@@ -169,7 +180,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     m_odometry = new SwerveDriveOdometry(m_kinematics, getGyroscopeRotation(), 
         new SwerveModulePosition[]{ m_frontLeftModule.getPosition(), m_frontRightModule.getPosition(), m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
-  }
+    }
 
     /**
     * Sets the gyroscope angle to zero. This can be used to set the direction the robot is currently facing to the
@@ -219,5 +230,53 @@ public class DrivetrainSubsystem extends SubsystemBase {
         for(WPI_TalonFX talon : talons) {
             SmartDashboard.putNumber(String.valueOf(talon.getDeviceID()), talon.getStatorCurrent());
         }
+
+        SmartDashboard.putNumber("Yaw", m_pigeon.getYaw());
+        SmartDashboard.putNumber("Pose X", m_odometry.getPoseMeters().getX());
+        SmartDashboard.putNumber("Pose Y", m_odometry.getPoseMeters().getY());
+        SmartDashboard.putNumber("Pose Angle", m_odometry.getPoseMeters().getRotation().getDegrees());
     }
+
+    // TODO Abstract this function out similair to 2022 code
+    // Pick back up here with path following constant placeholders
+  public SequentialCommandGroup followPathCommand(final boolean shouldResetOdometry, String trajectoryFileName) {
+    
+        // final Trajectory trajectory = generateTrajectory(waypoints);
+        final PathPlannerTrajectory trajectory = PathPlanner.loadPath(trajectoryFileName, 3.5, 3   );
+        // double Seconds = 0.0;
+        // System.out.println("===== Begin Sampling path =====");
+        // while(trajectory.getTotalTimeSeconds() > Seconds) {
+        //   PathPlannerState state = (PathPlannerState) trajectory.sample(Seconds);
+        //   System.out.println(
+        //     "time: " + Seconds
+        //     + ", x: " + state.poseMeters.getX()
+        //     + ", y: " + state.poseMeters.getY()
+        //     + ", angle: " + state.poseMeters.getRotation().getDegrees()
+        //     + ", holo: " + state.holonomicRotation.getDegrees()
+        //   );
+        // Seconds += 0.25;
+        // }
+        // System.out.println("===== End Sampling Path =====");
+        return new InstantCommand(() -> {
+          if (shouldResetOdometry) {
+            PathPlannerState initialSample = (PathPlannerState) trajectory.sample(0);
+            Pose2d initialPose = new Pose2d(initialSample.poseMeters.getTranslation(), initialSample.holonomicRotation);
+            resetOdometry(initialPose);
+          }
+          m_xController.reset();
+          m_yController.reset();
+        }).andThen(new PPSwerveControllerCommand(
+          trajectory,
+          () -> getPose(),
+          m_kinematics,
+          m_xController,
+          m_yController,
+          m_thetaController,
+          (SwerveModuleState[] moduleStates) -> {
+            drive(m_kinematics.toChassisSpeeds(moduleStates));
+          },
+          this
+        )).andThen(() -> drive(new ChassisSpeeds()), this);
+      }
+    
 }

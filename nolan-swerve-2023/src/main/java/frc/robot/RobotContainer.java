@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DefaultDriveCommand;
 import frc.robot.subsystems.DrivetrainSubsystem;
 
@@ -52,9 +53,8 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Back button zeros the gyroscope
-    new Button(m_controller::getBackButton)
+    new Trigger(m_controller::getBackButton).onTrue(new InstantCommand(() -> {m_drivetrainSubsystem.zeroGyroscope();}));
             // No requirements because we don't need to interrupt anything
-            .whenPressed(m_drivetrainSubsystem::zeroGyroscope);
   }
 
   /**
@@ -64,7 +64,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return new InstantCommand();
+    return new DrivetrainSubsystem().followPathCommand(true, "");
   }
 
   private static double deadband(double value, double deadband) {
