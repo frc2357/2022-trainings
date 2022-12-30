@@ -137,9 +137,11 @@ public class FalconSwerveModule {
         m_canCoder.configMagnetOffset(Math.toDegrees(offSetRadians), m_timeoutMs);
         m_canCoder.configSensorDirection(false, m_timeoutMs);
 
+        m_turnMotor.configVoltageCompSaturation(nominalVoltage);
         m_turnMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, m_timeoutMs);
         m_turnMotor.setSensorPhase(true);
-        m_turnMotor.setSelectedSensorPosition(getAbsoluteAngle() / motorEncoderPositionCoefficient, 0, m_timeoutMs);
+       m_turnMotor.setSelectedSensorPosition(getAbsoluteAngle() / motorEncoderPositionCoefficient, 0, m_timeoutMs); // SDS version
+       // m_turnMotor.setSelectedSensorPosition(Math.toRadians(m_canCoder.getAbsolutePosition()) / motorEncoderPositionCoefficient, 0, m_timeoutMs);
     }
 
     public SwerveModuleState getState() {
@@ -287,14 +289,14 @@ public class FalconSwerveModule {
     // From SDS library - RADIANS
     public double getAbsoluteAngle() {
 
-        //return Math.toRadians(m_canCoder.getAbsolutePosition());
-        double angle = Math.toRadians(m_canCoder.getAbsolutePosition());
-        angle %= 2.0 * Math.PI;
-        if (angle < 0.0) {
-            angle += 2.0 * Math.PI;
-        }
+        return Math.toRadians(m_canCoder.getAbsolutePosition());
+        //double angle = Math.toRadians(m_canCoder.getAbsolutePosition());
+        // angle %= 2.0 * Math.PI;
+        // if (angle < 0.0) {
+        //     angle += 2.0 * Math.PI;
+        // }
 
-        return angle;
+       // return angle;
     }
 
     // From SDS Library
@@ -309,8 +311,12 @@ public class FalconSwerveModule {
     }
 
     // Debugging functions
-    public double getRotationDegrees() {
+    public double getRotationRadians() {
         return getAbsoluteAngle();
+    }
+
+    public double getRotationDegrees() {
+        return m_canCoder.getAbsolutePosition();
     }
 
     public double getDistanceInMeters() {

@@ -92,7 +92,7 @@ public class Drivetrain extends SubsystemBase {
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, kMaxSpeed);
 
     SmartDashboard.putString("Front left desired state", swerveModuleStates[0].toString());
-    m_frontLeft.rotationTarget(swerveModuleStates[0].angle.getRadians());
+    
 
     //System.out.println("Front Left: ");
     //System.out.println(swerveModuleStates[0]);
@@ -110,6 +110,10 @@ public class Drivetrain extends SubsystemBase {
     //m_frontRight.setDesiredState(swerveModuleStates[1]);
     //m_backLeft.setDesiredState(swerveModuleStates[2]);
     //m_backRight.setDesiredState(swerveModuleStates[3]);
+
+    m_frontLeft.rotationTarget(swerveModuleStates[0].angle.getRadians());
+  //  m_frontLeft.getRotationCurrent();
+
   }
 
   /** Updates the field relative position of the robot. */

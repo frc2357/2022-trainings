@@ -22,7 +22,7 @@ public final class Constants {
     }
 
     public static final class SWERVE {
-        public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(162.7);
+        public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(162.7); // Was 162.7
         public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(135.08);
         public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(125);
         public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(9.45);
