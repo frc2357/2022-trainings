@@ -49,13 +49,11 @@ public class FalconSwerveModule {
      */
     private static final double m_driveVelF = (1023.0 / 20660.0) + 0.00;
 
-    //TODO: verify pid values
+    // TODO: verify pid values
     // PID calculated from SysID tool
     private static final double m_driveVelP = 0.00071716;
     private static final double m_driveVelI = 0.0;
     private static final double m_driveVelD = 0.0;
-
-    
 
     private static final double m_nominalOutput = 0;
     private static final double m_peakOutput = 0.5;
@@ -67,7 +65,8 @@ public class FalconSwerveModule {
     private static final int ENCODER_RESET_ITERATIONS = 500;
     private static final double ENCODER_RESET_MAX_ANGULAR_VELOCITY = Math.toRadians(0.5);
     private double resetIteration = 0;
-    private static final double motorEncoderPositionCoefficient = 2.0 * Math.PI / MOTOR_ENCODER_CLICKS_PER_ROTATION * steerGearRatio;
+    private static final double motorEncoderPositionCoefficient = 2.0 * Math.PI / MOTOR_ENCODER_CLICKS_PER_ROTATION
+            * steerGearRatio;
     private static final double motorEncoderVelocityCoefficient = motorEncoderPositionCoefficient * 10.0;
 
     // From sds library
@@ -76,7 +75,6 @@ public class FalconSwerveModule {
     private static final double m_turnVelD = 0.1;
 
     private static final double m_turnVelF = (1023.0 * motorEncoderVelocityCoefficient / nominalVoltage);
-
 
     private final WPI_TalonFX m_driveMotor;
     private final WPI_TalonFX m_turnMotor;
@@ -128,7 +126,7 @@ public class FalconSwerveModule {
         m_turnMotor.configPeakOutputForward(m_peakOutput, m_timeoutMs);
         m_turnMotor.configPeakOutputReverse(-m_peakOutput, m_timeoutMs);
 
-        m_turnMotor.config_kF(m_gainsSlot, m_turnVelF, m_timeoutMs);
+        //m_turnMotor.config_kF(m_gainsSlot, m_turnVelF, m_timeoutMs);
         m_turnMotor.config_kP(m_gainsSlot, m_turnVelP, m_timeoutMs);
         m_turnMotor.config_kI(m_gainsSlot, m_turnVelI, m_timeoutMs);
         m_turnMotor.config_kD(m_gainsSlot, m_turnVelD, m_timeoutMs);
@@ -142,31 +140,27 @@ public class FalconSwerveModule {
         m_turnMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, m_timeoutMs);
         m_turnMotor.setSensorPhase(true);
         m_turnMotor.setSelectedSensorPosition(getAbsoluteAngle() / motorEncoderPositionCoefficient, 0, m_timeoutMs);
-
-    
-        
-
     }
 
     public SwerveModuleState getState() {
         return new SwerveModuleState(
-                getVelocity(), Rotation2d.fromDegrees(m_canCoder.getAbsolutePosition()));
+                getVelocity(), Rotation2d.fromRadians(getAbsoluteAngle()));
     }
 
     public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(
                 clicksToMeters(m_driveMotor.getSelectedSensorPosition()),
-                Rotation2d.fromDegrees(m_canCoder.getAbsolutePosition()));
+                Rotation2d.fromRadians(getAbsoluteAngle()));
     }
 
     public void setDesiredStateOld(SwerveModuleState desiredState) {
         SwerveModuleState state = SwerveModuleState.optimize(desiredState,
-                Rotation2d.fromDegrees(m_canCoder.getAbsolutePosition()));
+                Rotation2d.fromRadians(getAbsoluteAngle()));
 
         final double driveOutput = m_drivePIDController.calculate(getVelocity(), state.speedMetersPerSecond);
         final double driveFeedforward = m_driveFeedforward.calculate(state.speedMetersPerSecond);
 
-        final double turnOutput = m_turningPIDController.calculate(m_canCoder.getAbsolutePosition(),
+        final double turnOutput = m_turningPIDController.calculate(getAbsoluteAngle(),
                 state.angle.getRadians());
         final double turnFeedforward = m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity);
 
@@ -178,46 +172,49 @@ public class FalconSwerveModule {
 
         // WPI optimize (doesn't work because ctre control loops are not continous)
         // desiredState = SwerveModuleState.optimize(desiredState,
-        //           Rotation2d.fromRadians(getAbsoluteAngle()));
+        // Rotation2d.fromRadians(getAbsoluteAngle()));
 
         // SDS optimize code (doesn't work)
-        // double steerAngleRadians = desiredState.angle.getRadians();
-        // double speedMetersPerSecond = desiredState.speedMetersPerSecond;
+        double steerAngleRadians = desiredState.angle.getRadians();
+        double speedMetersPerSecond = desiredState.speedMetersPerSecond;
 
-        // // Optimize
-        // steerAngleRadians %= (2.0 * Math.PI);
-        //     if (steerAngleRadians < 0.0) {
-        //         steerAngleRadians += 2.0 * Math.PI;
-        //     }
+        // Optimize
+        steerAngleRadians %= (2.0 * Math.PI);
+        if (steerAngleRadians < 0.0) {
+            steerAngleRadians += 2.0 * Math.PI;
+        }
 
-        //     double difference = steerAngleRadians - getStateAngle();
-        //     // Change the target angle so the difference is in the range [-pi, pi) instead of [0, 2pi)
-        //     if (difference >= Math.PI) {
-        //         steerAngleRadians -= 2.0 * Math.PI;
-        //     } else if (difference < -Math.PI) {
-        //         steerAngleRadians += 2.0 * Math.PI;
-        //     }
-        //     difference = steerAngleRadians - getStateAngle(); // Recalculate difference
+        double difference = steerAngleRadians - getStateAngle();
+        // Change the target angle so the difference is in the range [-pi, pi) instead
+        // of [0, 2pi)
+        if (difference >= Math.PI) {
+            steerAngleRadians -= 2.0 * Math.PI;
+        } else if (difference < -Math.PI) {
+            steerAngleRadians += 2.0 * Math.PI;
+        }
+        difference = steerAngleRadians - getStateAngle(); // Recalculate difference
 
-        //     // If the difference is greater than 90 deg or less than -90 deg the drive can be inverted so the total
-        //     // movement of the module is less than 90 deg
-        //     if (difference > Math.PI / 2.0 || difference < -Math.PI / 2.0) {
-        //         // Only need to add 180 deg here because the target angle will be put back into the range [0, 2pi)
-        //         steerAngleRadians += Math.PI;
-        //         speedMetersPerSecond *= -1.0;
-        //     }
+        // If the difference is greater than 90 deg or less than -90 deg the drive can
+        // be inverted so the total
+        // movement of the module is less than 90 deg
+        if (difference > Math.PI / 2.0 || difference < -Math.PI / 2.0) {
+            // Only need to add 180 deg here because the target angle will be put back into
+            // the range [0, 2pi)
+            steerAngleRadians += Math.PI;
+            speedMetersPerSecond *= -1.0;
+        }
 
-        //     // Put the target angle back into the range [0, 2pi)
-        //     steerAngleRadians %= (2.0 * Math.PI);
-        //     if (steerAngleRadians < 0.0) {
-        //         steerAngleRadians += 2.0 * Math.PI;
-        //     }
+        // Put the target angle back into the range [0, 2pi)
+        steerAngleRadians %= (2.0 * Math.PI);
+        if (steerAngleRadians < 0.0) {
+            steerAngleRadians += 2.0 * Math.PI;
+        }
 
         // Team 364's optimize
-        SwerveModuleState state = optimize(desiredState, Rotation2d.fromDegrees(m_canCoder.getAbsolutePosition()));
-        double steerAngleRadians = state.angle.getRadians();
-        double speedMetersPerSecond = state.speedMetersPerSecond;
-
+        // SwerveModuleState state = optimize(desiredState,
+        // Rotation2d.fromDegrees(m_canCoder.getAbsolutePosition()));
+        // double steerAngleRadians = state.angle.getRadians();
+        // double speedMetersPerSecond = state.speedMetersPerSecond;
 
         // calculate speed
         double driveSensorUnitsPer100Ms = calculateDriveSensorUnitsPer100Ms(speedMetersPerSecond);
@@ -227,42 +224,47 @@ public class FalconSwerveModule {
         m_turnMotor.set(TalonFXControlMode.Position, turnSensorUnitsPosition);
     }
 
-    // Heavily based from SDS library setReferenceAngle in Falcon500SteerControllerFactoryBuilder.java
+    // Heavily based from SDS library setReferenceAngle in
+    // Falcon500SteerControllerFactoryBuilder.java
     public double calculateTurnSensorUnitsPosition(double desiredRadians) {
         double currentAngleRadians = m_turnMotor.getSelectedSensorPosition() * motorEncoderPositionCoefficient;
-        return desiredRadians / motorEncoderPositionCoefficient;
+        //return desiredRadians / motorEncoderPositionCoefficient;
 
         // Reset the NEO's encoder periodically when the module is not rotating.
-        // Sometimes (~5% of the time) when we initialize, the absolute encoder isn't fully set up, and we don't
-        // end up getting a good reading. If we reset periodically this won't matter anymore.
-        // if (m_turnMotor.getSelectedSensorVelocity() * motorEncoderVelocityCoefficient < ENCODER_RESET_MAX_ANGULAR_VELOCITY) {
-        //     if (++resetIteration >= ENCODER_RESET_ITERATIONS) {
-        //         resetIteration = 0;
-        //         double absoluteAngle = getAbsoluteAngle();
-        //         System.out.println("Reseting motors");
-        //         m_turnMotor.setSelectedSensorPosition(absoluteAngle / motorEncoderPositionCoefficient);
-        //         currentAngleRadians = absoluteAngle;
-        //     }
+        // Sometimes (~5% of the time) when we initialize, the absolute encoder isn't
+        // fully set up, and we don't
+        // end up getting a good reading. If we reset periodically this won't matter
+        // anymore.
+        // if (m_turnMotor.getSelectedSensorVelocity() * motorEncoderVelocityCoefficient
+        // < ENCODER_RESET_MAX_ANGULAR_VELOCITY) {
+        // if (++resetIteration >= ENCODER_RESET_ITERATIONS) {
+        // resetIteration = 0;
+        // double absoluteAngle = getAbsoluteAngle();
+        // System.out.println("Reseting motors");
+        // m_turnMotor.setSelectedSensorPosition(absoluteAngle /
+        // motorEncoderPositionCoefficient);
+        // currentAngleRadians = absoluteAngle;
+        // }
         // } else {
-        //     resetIteration = 0;
+        // resetIteration = 0;
         // }
 
-        // double currentAngleRadiansMod = currentAngleRadians % (2.0 * Math.PI);
-        // if (currentAngleRadiansMod < 0.0) {
-        //     currentAngleRadiansMod += 2.0 * Math.PI;
-        // }
+        double currentAngleRadiansMod = currentAngleRadians % (2.0 * Math.PI);
+        if (currentAngleRadiansMod < 0.0) {
+            currentAngleRadiansMod += 2.0 * Math.PI;
+        }
 
-        // // The reference angle has the range [0, 2pi) but the Falcon's encoder can go above that
-        // double adjustedReferenceAngleRadians = desiredRadians + currentAngleRadians - currentAngleRadiansMod;
-        // if (desiredRadians - currentAngleRadiansMod > Math.PI) {
-        //     adjustedReferenceAngleRadians -= 2.0 * Math.PI;
-        // } else if (desiredRadians - currentAngleRadiansMod < -Math.PI) {
-        //     adjustedReferenceAngleRadians += 2.0 * Math.PI;
-        // }
+        // The reference angle has the range [0, 2pi) but the Falcon's encoder can go
+        // above that
+        double adjustedReferenceAngleRadians = desiredRadians + currentAngleRadians - currentAngleRadiansMod;
+        if (desiredRadians - currentAngleRadiansMod > Math.PI) {
+            adjustedReferenceAngleRadians -= 2.0 * Math.PI;
+        } else if (desiredRadians - currentAngleRadiansMod < -Math.PI) {
+            adjustedReferenceAngleRadians += 2.0 * Math.PI;
+        }
 
-        //return adjustedReferenceAngleRadians / motorEncoderPositionCoefficient;
+        return adjustedReferenceAngleRadians / motorEncoderPositionCoefficient;
     }
-
 
     public double calculateDriveSensorUnitsPer100Ms(double speedMetersPerSecond) {
         double driveSensorUnitsPer100Ms = metersToClicks(speedMetersPerSecond) / 10;
@@ -284,6 +286,8 @@ public class FalconSwerveModule {
 
     // From SDS library - RADIANS
     public double getAbsoluteAngle() {
+
+        //return Math.toRadians(m_canCoder.getAbsolutePosition());
         double angle = Math.toRadians(m_canCoder.getAbsolutePosition());
         angle %= 2.0 * Math.PI;
         if (angle < 0.0) {
@@ -306,7 +310,7 @@ public class FalconSwerveModule {
 
     // Debugging functions
     public double getRotationDegrees() {
-        return m_canCoder.getAbsolutePosition();
+        return getAbsoluteAngle();
     }
 
     public double getDistanceInMeters() {
@@ -327,51 +331,53 @@ public class FalconSwerveModule {
 
     // Following two functions from team 364
     /**
-   * Minimize the change in heading the desired swerve module state would require by potentially
-   * reversing the direction the wheel spins. Customized from WPILib's version to include placing
-   * in appropriate scope for CTRE onboard control.
-   *
-   * @param desiredState The desired state.
-   * @param currentAngle The current module angle.
-   */
-  public static SwerveModuleState optimize(SwerveModuleState desiredState, Rotation2d currentAngle) {
-    double targetAngle = placeInAppropriate0To360Scope(currentAngle.getDegrees(), desiredState.angle.getDegrees());
-    double targetSpeed = desiredState.speedMetersPerSecond;
-    double delta = targetAngle - currentAngle.getDegrees();
-    if (Math.abs(delta) > 90){
-        targetSpeed = -targetSpeed;
-        targetAngle = delta > 90 ? (targetAngle -= 180) : (targetAngle += 180);
-    }        
-    return new SwerveModuleState(targetSpeed, Rotation2d.fromRadians(targetAngle));
-  }
+     * Minimize the change in heading the desired swerve module state would require
+     * by potentially
+     * reversing the direction the wheel spins. Customized from WPILib's version to
+     * include placing
+     * in appropriate scope for CTRE onboard control.
+     *
+     * @param desiredState The desired state.
+     * @param currentAngle The current module angle.
+     */
+    public static SwerveModuleState optimize(SwerveModuleState desiredState, Rotation2d currentAngle) {
+        double targetAngle = placeInAppropriate0To360Scope(currentAngle.getDegrees(), desiredState.angle.getDegrees());
+        double targetSpeed = desiredState.speedMetersPerSecond;
+        double delta = targetAngle - currentAngle.getDegrees();
+        if (Math.abs(delta) > 90) {
+            targetSpeed = -targetSpeed;
+            targetAngle = delta > 90 ? (targetAngle -= 180) : (targetAngle += 180);
+        }
+        return new SwerveModuleState(targetSpeed, Rotation2d.fromRadians(targetAngle));
+    }
 
-  /**
+    /**
      * @param scopeReference Current Angle
-     * @param newAngle Target Angle
+     * @param newAngle       Target Angle
      * @return Closest angle within scope
      */
     private static double placeInAppropriate0To360Scope(double scopeReference, double newAngle) {
-      double lowerBound;
-      double upperBound;
-      double lowerOffset = scopeReference % 360;
-      if (lowerOffset >= 0) {
-          lowerBound = scopeReference - lowerOffset;
-          upperBound = scopeReference + (360 - lowerOffset);
-      } else {
-          upperBound = scopeReference - lowerOffset;
-          lowerBound = scopeReference - (360 + lowerOffset);
-      }
-      while (newAngle < lowerBound) {
-          newAngle += 360;
-      }
-      while (newAngle > upperBound) {
-          newAngle -= 360;
-      }
-      if (newAngle - scopeReference > 180) {
-          newAngle -= 360;
-      } else if (newAngle - scopeReference < -180) {
-          newAngle += 360;
-      }
-      return newAngle;
-  }
+        double lowerBound;
+        double upperBound;
+        double lowerOffset = scopeReference % 360;
+        if (lowerOffset >= 0) {
+            lowerBound = scopeReference - lowerOffset;
+            upperBound = scopeReference + (360 - lowerOffset);
+        } else {
+            upperBound = scopeReference - lowerOffset;
+            lowerBound = scopeReference - (360 + lowerOffset);
+        }
+        while (newAngle < lowerBound) {
+            newAngle += 360;
+        }
+        while (newAngle > upperBound) {
+            newAngle -= 360;
+        }
+        if (newAngle - scopeReference > 180) {
+            newAngle -= 360;
+        } else if (newAngle - scopeReference < -180) {
+            newAngle += 360;
+        }
+        return newAngle;
+    }
 }
