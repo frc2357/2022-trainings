@@ -10,10 +10,13 @@ import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -79,6 +82,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
     private WPI_TalonFX talons[];
 
     private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
+
+    private SwerveDriveOdometry m_odometry;
 
     public DrivetrainSubsystem() {
       ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain");
@@ -161,6 +166,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
                     DRIVE_CANBUS,
         BACK_RIGHT_MODULE_STEER_OFFSET
     );
+
+    m_odometry = new SwerveDriveOdometry(m_kinematics, getGyroscopeRotation(), 
+        new SwerveModulePosition[]{ m_frontLeftModule.getPosition(), m_frontRightModule.getPosition(), m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
   }
 
     /**
@@ -175,12 +183,28 @@ public class DrivetrainSubsystem extends SubsystemBase {
         return Rotation2d.fromDegrees(m_pigeon.getYaw());
     }
 
+    public Pose2d getPose() {
+        return m_odometry.getPoseMeters();
+    }
+
+    public void resetOdometry(Pose2d pose) {
+        m_odometry.resetPosition(
+            getGyroscopeRotation(),
+            new SwerveModulePosition[]{ m_frontLeftModule.getPosition(), m_frontRightModule.getPosition(), m_backLeftModule.getPosition(), m_backRightModule.getPosition() },
+            pose
+        );
+    }
+
     public void drive(ChassisSpeeds chassisSpeeds) {
         m_chassisSpeeds = chassisSpeeds;
     }
 
     @Override
     public void periodic() {
+        m_odometry.update(getGyroscopeRotation(), 
+            new SwerveModulePosition[]{ m_frontLeftModule.getPosition(), m_frontRightModule.getPosition(), m_backLeftModule.getPosition(), m_backRightModule.getPosition() }
+        );
+
         SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_VELOCITY_METERS_PER_SECOND);
   
