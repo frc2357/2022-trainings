@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -86,15 +85,13 @@ public class DrivetrainSubsystem extends SubsystemBase {
     private final SwerveModule m_backLeftModule;
     private final SwerveModule m_backRightModule;
 
-    private WPI_TalonFX talons[];
-
     private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
 
     private SwerveDriveOdometry m_odometry;
 
-    private static final PIDController m_xController = new PIDController(0, 0, 0);
-  private static final PIDController m_yController = new PIDController(0, 0, 0);
-  private static final PIDController m_thetaController = new PIDController(0, 0, 0);
+    private static final PIDController m_xController = new PIDController(0.56122, 0, 0);
+    private static final PIDController m_yController = new PIDController(0.56122, 0, 0);
+    private static final PIDController m_thetaController = new PIDController(0, 0, 0);
 
     public DrivetrainSubsystem() {
       ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain");
@@ -160,8 +157,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
         BACK_LEFT_MODULE_DRIVE_MOTOR,
         BACK_LEFT_MODULE_STEER_MOTOR,
         BACK_LEFT_MODULE_STEER_ENCODER,
-                    // the canbus the module is on
-                    DRIVE_CANBUS,
+        // the canbus the module is on
+        DRIVE_CANBUS,
         BACK_LEFT_MODULE_STEER_OFFSET
     );
 
@@ -173,8 +170,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
         BACK_RIGHT_MODULE_DRIVE_MOTOR,
         BACK_RIGHT_MODULE_STEER_MOTOR,
         BACK_RIGHT_MODULE_STEER_ENCODER,
-                    // the canbus the module is on
-                    DRIVE_CANBUS,
+        // the canbus the module is on
+        DRIVE_CANBUS,
         BACK_RIGHT_MODULE_STEER_OFFSET
     );
 
@@ -227,10 +224,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
   
         SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
   
-        for(WPI_TalonFX talon : talons) {
-            SmartDashboard.putNumber(String.valueOf(talon.getDeviceID()), talon.getStatorCurrent());
-        }
-
         SmartDashboard.putNumber("Yaw", m_pigeon.getYaw());
         SmartDashboard.putNumber("Pose X", m_odometry.getPoseMeters().getX());
         SmartDashboard.putNumber("Pose Y", m_odometry.getPoseMeters().getY());

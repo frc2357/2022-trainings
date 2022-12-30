@@ -41,12 +41,12 @@ public final class Constants {
     public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 11; 
     public static final int FRONT_LEFT_MODULE_STEER_MOTOR = 12; 
     public static final int FRONT_LEFT_MODULE_STEER_ENCODER = 19; 
-    public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(162.7); // FIXME Measure and set front left steer offset
+    public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(162.7); // Init 162.7
 
     public static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 13; 
     public static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 14; 
     public static final int FRONT_RIGHT_MODULE_STEER_ENCODER = 20; 
-    public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(135.08); // FIXME Measure and set front right steer offset
+    public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(135.08);//-Math.toRadians(135.08); // FIXME Measure and set front right steer offset
 
     public static final int BACK_LEFT_MODULE_DRIVE_MOTOR = 15; 
     public static final int BACK_LEFT_MODULE_STEER_MOTOR = 16; 
