@@ -91,7 +91,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     private static final PIDController m_xController = new PIDController(0.56122, 0, 0);
     private static final PIDController m_yController = new PIDController(0.56122, 0, 0);
-    private static final PIDController m_thetaController = new PIDController(0, 0, 0);
+    private static final PIDController m_thetaController = new PIDController(2.05, 0, 0);
 
     public DrivetrainSubsystem() {
       ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain");
