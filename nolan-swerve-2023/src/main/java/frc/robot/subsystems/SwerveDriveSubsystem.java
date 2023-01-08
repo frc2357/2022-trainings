@@ -80,14 +80,11 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		//
 		public double m_maxAngularVelocityRadiansPerSecond;
 
-		public double m_pXController;
-		public double m_pYController;
-		public double m_pThetaController;
-	}
 
-	private PIDController m_xController;
-	private PIDController m_yController;
-	private PIDController m_thetaController;
+		public PIDController m_xController;
+		public PIDController m_yController;
+		public PIDController m_thetaController;
+	}
 
 	public SwerveDriveSubsystem(WPI_Pigeon2 pigeon, SwerveModule frontLeft, SwerveModule frontRight,
 			SwerveModule backLeft, SwerveModule backRight) {
@@ -118,10 +115,6 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
 						m_frontRightModule.getPosition(),
 						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
-
-		m_xController = new PIDController(m_config.m_pXController, 0, 0);
-		m_yController = new PIDController(m_config.m_pYController, 0, 0);
-		m_thetaController = new PIDController(m_config.m_pThetaController, 0, 0);
 	}
 
 	public void zeroGyroscope() {
@@ -217,15 +210,15 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 						initialSample.holonomicRotation);
 				resetOdometry(initialPose);
 			}
-			m_xController.reset();
-			m_yController.reset();
+			m_config.m_xController.reset();
+			m_config.m_yController.reset();
 		}).andThen(new PPSwerveControllerCommand(
 				trajectory,
 				() -> getPose(),
 				m_kinematics,
-				m_xController,
-				m_yController,
-				m_thetaController,
+				m_config.m_xController,
+				m_config.m_yController,
+				m_config.m_thetaController,
 				(SwerveModuleState[] moduleStates) -> {
 					drive(m_kinematics.toChassisSpeeds(moduleStates));
 				},

@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 
+import edu.wpi.first.math.controller.PIDController;
 import frc.robot.subsystems.SwerveDriveSubsystem;
 
 /**
@@ -77,9 +78,9 @@ public final class Constants {
         config.m_maxAngularVelocityRadiansPerSecond = config.m_maxVelocityMetersPerSecond /
                 Math.hypot(config.m_trackwidthMeters / 2.0, config.m_wheelbaseMeters / 2.0);
 
-        config.m_pXController = .56122;
-        config.m_pYController = .56122;
-        config.m_pThetaController = 2.15;
+        config.m_xController = new PIDController(.56122, 0, 0);
+        config.m_yController = new PIDController(.56122, 0, 0);
+        config.m_thetaController = new PIDController(2.15, 0, 0);
         
         return config;
     }
