@@ -4,6 +4,10 @@
 
 package frc.robot;
 
+import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
+
+import frc.robot.subsystems.SwerveDriveSubsystem;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -57,4 +61,22 @@ public final class Constants {
     public static final int BACK_RIGHT_MODULE_STEER_MOTOR = 18; 
     public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 22; 
     public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(9.45); // FIXME Measure and set back right steer offset
+
+	public static final double DEADBAND = 0.1;
+
+    public static SwerveDriveSubsystem.Configuration GET_SWERVE_DRIVE_CONFIG() {
+        SwerveDriveSubsystem.Configuration config = new SwerveDriveSubsystem.Configuration();
+
+        config.m_trackwidth = .60325;
+        config.m_wheelbase = .62865;
+
+        config.m_maxVoltage = 10.0;
+        config.m_maxVelocity = 6380.0 / 60.0 *
+                SdsModuleConfigurations.MK4I_L2.getDriveReduction() *
+                SdsModuleConfigurations.MK4I_L2.getWheelDiameter() * Math.PI;
+        config.m_maxAngularVelocity = config.m_maxVelocity /
+                Math.hypot(config.m_trackwidth / 2.0, config.m_wheelbase / 2.0);
+        
+        return config;
+    }
 }
