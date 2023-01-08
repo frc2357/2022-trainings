@@ -48,17 +48,46 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	private SwerveDriveOdometry m_odometry;
 
 	public static class Configuration {
-		public double m_trackwidth;
-		public double m_wheelbase;
+		/**
+		 * The left-to-right distance between the drivetrain wheels (measured from center to center)
+		 */
+		public double m_trackwidthMeters;
 
+		/**
+		 * The front-to-back distance between the drivetrain wheels (measured from center to center)
+		 */
+		public double m_wheelbaseMeters;
+
+		/**
+		 * The maximum voltage that will be delivered to the drive motors
+		 */
 		public double m_maxVoltage;
-		public double m_maxVelocity; // Meters per second
-		public double m_maxAngularVelocity; // Radians per second
+
+		/**
+		 * The maximum velocity of the robot in meters per second
+		 * (How fast the robot can drive in a straight line)
+		 * 
+		 * Formula: 6380 / 60 * <gear ratio> * <wheel diameter> * Math.PI
+		 */
+		public double m_maxVelocityMetersPerSecond;
+
+		/**
+		 * The maximum angular velocity of the robot in radians per second 
+		 * (how fast the robot can rotate in place)
+		 * 
+		 * Formula: m_maxVelocityMetersPerSecond / Math.hypot(m_trackwidthMeters / 2, m_wheelbaseMeters / 2)
+		 */
+		//
+		public double m_maxAngularVelocityRadiansPerSecond;
+
+		public double m_pXController;
+		public double m_pYController;
+		public double m_pThetaController;
 	}
 
-	private static final PIDController m_xController = new PIDController(0.56122, 0, 0);
-	private static final PIDController m_yController = new PIDController(0.56122, 0, 0);
-	private static final PIDController m_thetaController = new PIDController(0, 0, 0);
+	private PIDController m_xController;
+	private PIDController m_yController;
+	private PIDController m_thetaController;
 
 	public SwerveDriveSubsystem(WPI_Pigeon2 pigeon, SwerveModule frontLeft, SwerveModule frontRight,
 			SwerveModule backLeft, SwerveModule backRight) {
@@ -76,19 +105,23 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		m_config = config;
 
 		m_kinematics = new SwerveDriveKinematics(
-				new Translation2d(m_config.m_trackwidth / 2.0,
-						m_config.m_wheelbase / 2.0),
-				new Translation2d(m_config.m_trackwidth / 2.0,
-						-m_config.m_wheelbase / 2.0),
-				new Translation2d(-m_config.m_trackwidth / 2.0,
-						m_config.m_wheelbase / 2.0),
-				new Translation2d(-m_config.m_trackwidth / 2.0,
-						-m_config.m_wheelbase / 2.0));
+				new Translation2d(m_config.m_trackwidthMeters / 2.0,
+						m_config.m_wheelbaseMeters / 2.0),
+				new Translation2d(m_config.m_trackwidthMeters / 2.0,
+						-m_config.m_wheelbaseMeters / 2.0),
+				new Translation2d(-m_config.m_trackwidthMeters / 2.0,
+						m_config.m_wheelbaseMeters / 2.0),
+				new Translation2d(-m_config.m_trackwidthMeters / 2.0,
+						-m_config.m_wheelbaseMeters / 2.0));
 
 		m_odometry = new SwerveDriveOdometry(m_kinematics, getGyroscopeRotation(),
 				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
 						m_frontRightModule.getPosition(),
 						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
+
+		m_xController = new PIDController(m_config.m_pXController, 0, 0);
+		m_yController = new PIDController(m_config.m_pYController, 0, 0);
+		m_thetaController = new PIDController(m_config.m_pThetaController, 0, 0);
 	}
 
 	public void zeroGyroscope() {
@@ -114,11 +147,10 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
 	public void drive(double x, double y, double rotation) {
 		ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-				x * m_config.m_maxVelocity,
-				y * m_config.m_maxVelocity,
-				rotation * m_config.m_maxAngularVelocity,
-				getGyroscopeRotation()
-		);
+				x * m_config.m_maxVelocityMetersPerSecond,
+				y * m_config.m_maxVelocityMetersPerSecond,
+				rotation * m_config.m_maxAngularVelocityRadiansPerSecond,
+				getGyroscopeRotation());
 
 		drive(chassisSpeeds);
 	}
@@ -132,15 +164,19 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
 
 		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
-		SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocity);
+		SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocityMetersPerSecond);
 
-		m_frontLeftModule.set(states[0].speedMetersPerSecond / m_config.m_maxVelocity * m_config.m_maxVoltage,
+		m_frontLeftModule.set(
+				states[0].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
 				states[0].angle.getRadians());
-		m_frontRightModule.set(states[1].speedMetersPerSecond / m_config.m_maxVelocity * m_config.m_maxVoltage,
+		m_frontRightModule.set(
+				states[1].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
 				states[1].angle.getRadians());
-		m_backLeftModule.set(states[2].speedMetersPerSecond / m_config.m_maxVelocity * m_config.m_maxVoltage,
+		m_backLeftModule.set(
+				states[2].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
 				states[2].angle.getRadians());
-		m_backRightModule.set(states[3].speedMetersPerSecond / m_config.m_maxVelocity * m_config.m_maxVoltage,
+		m_backRightModule.set(
+				states[3].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
 				states[3].angle.getRadians());
 	}
 

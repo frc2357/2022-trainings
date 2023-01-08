@@ -67,15 +67,19 @@ public final class Constants {
     public static SwerveDriveSubsystem.Configuration GET_SWERVE_DRIVE_CONFIG() {
         SwerveDriveSubsystem.Configuration config = new SwerveDriveSubsystem.Configuration();
 
-        config.m_trackwidth = .60325;
-        config.m_wheelbase = .62865;
+        config.m_trackwidthMeters = .60325;
+        config.m_wheelbaseMeters = .62865;
 
         config.m_maxVoltage = 10.0;
-        config.m_maxVelocity = 6380.0 / 60.0 *
+        config.m_maxVelocityMetersPerSecond = 6380.0 / 60.0 *
                 SdsModuleConfigurations.MK4I_L2.getDriveReduction() *
                 SdsModuleConfigurations.MK4I_L2.getWheelDiameter() * Math.PI;
-        config.m_maxAngularVelocity = config.m_maxVelocity /
-                Math.hypot(config.m_trackwidth / 2.0, config.m_wheelbase / 2.0);
+        config.m_maxAngularVelocityRadiansPerSecond = config.m_maxVelocityMetersPerSecond /
+                Math.hypot(config.m_trackwidthMeters / 2.0, config.m_wheelbaseMeters / 2.0);
+
+        config.m_pXController = .56122;
+        config.m_pYController = .56122;
+        config.m_pThetaController = 2.15;
         
         return config;
     }
